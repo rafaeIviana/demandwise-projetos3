@@ -133,7 +133,7 @@ cd [NOME_DO_PROJETO]
 | Gilberto Dias | [gdsn@cesar.school](mailto:gdsn@cesar.school) | Developer |
 | Heitor Antonio  | [haotd@cesar.school](mailto:haotd@cesar.school) | Developer | 
 | João Vitor Lopes | [jvla@cesar.school](mailto:jvla@cesar.school) | Developer |
-| Luiz Guilherme Silvestre | [lgsgs@cesar.school](mailto:lgsgs@cesar.school) | Organizer |
+| Luiz Guilherme Silvestre | [lgsgs@cesar.school](mailto:lgsgs@cesar.school) | Developer |
 | Pedro Lima | [phpl@cesar.school](mailto:phpl@cesar.school) | Developer |
 | Rafael Viana | [rlvs@cesar.school](mailto:rlvs@cesar.school) | Tech Lead | 
 
