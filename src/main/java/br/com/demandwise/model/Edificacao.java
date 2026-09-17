@@ -1,14 +1,12 @@
 package br.com.demandwise.model;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
 public class Edificacao {
 
   @Valid
-  @Size(min = 2, message = "Projeto MUC deve ter no mínimo 2 unidades consumidoras (norma NDU-PE-02)")
   private List<Apartamento> apartamentos;
 
   public Edificacao() {
