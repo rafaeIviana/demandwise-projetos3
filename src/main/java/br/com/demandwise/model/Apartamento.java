@@ -16,7 +16,6 @@ public class Apartamento {
   public Apartamento() {
   }
 
-  // ...
 
   public Apartamento(double areaUtil, double potenciaInstalada, double potenciaRecargaVe, boolean possuiEstudoDeRede) {
     this.areaUtil = areaUtil;
