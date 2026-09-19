@@ -3,7 +3,6 @@ package br.com.demandwise.model;
 import jakarta.validation.Valid;
 
 import java.util.List;
-
 public class Edificacao {
 
   @Valid
