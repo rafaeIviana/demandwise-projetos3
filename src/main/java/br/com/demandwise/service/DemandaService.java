@@ -58,7 +58,7 @@ public class DemandaService {
         List<Apartamento> apartamentos = edificacao.getApartamentos();
 
         if (apartamentos == null || apartamentos.isEmpty()) {
-            return 0.0;
+            return calcularDemandaServico(edificacao);
         }
 
         double demandaTotal = 0.0;
@@ -76,7 +76,13 @@ public class DemandaService {
         double fatorSeguranca =
                 obterFatorSeguranca(demandaComCoincidencia);
 
-        return demandaComCoincidencia * fatorSeguranca;
+        double demandaResidencialFinal =
+                demandaComCoincidencia * fatorSeguranca;
+
+        double demandaServico =
+                calcularDemandaServico(edificacao);
+
+        return demandaResidencialFinal + demandaServico;
     }
 
     private double calcularDemandaPorArea(double areaUtil) {
@@ -142,5 +148,80 @@ public class DemandaService {
         }
 
         return 1.1;
+    }
+
+    private double calcularDemandaServico(Edificacao edificacao) {
+
+        double potenciaIluminacao =
+                edificacao.getPotenciaIluminacao();
+
+        double potenciaTomadas =
+                edificacao.getPotenciaTomadas();
+
+        List<Double> motores =
+                edificacao.getPotenciasMotores();
+
+        double demandaIluminacaoETomadas;
+
+        if (motores != null && motores.size() == 4) {
+
+            double potenciaTotal =
+                    potenciaIluminacao + potenciaTomadas;
+
+            demandaIluminacaoETomadas =
+                    (potenciaTotal / 0.80) * 1.00;
+
+        } else {
+
+            double demandaIluminacao =
+                    (potenciaIluminacao / 0.80) * 1.00;
+
+            double demandaTomadas =
+                    (potenciaTomadas / 0.80) * 0.50;
+
+            demandaIluminacaoETomadas =
+                    demandaIluminacao + demandaTomadas;
+        }
+
+        double demandaMotores =
+                calcularDemandaMotores(motores);
+
+        return demandaIluminacaoETomadas + demandaMotores;
+    }
+
+    private double calcularDemandaMotores(
+            List<Double> potenciasMotores) {
+
+        if (potenciasMotores == null ||
+                potenciasMotores.isEmpty()) {
+
+            return 0.0;
+        }
+
+        double maiorMotor = 0.0;
+        double somaDemaisMotores = 0.0;
+
+        for (Double potencia : potenciasMotores) {
+
+            if (potencia == null || potencia <= 0) {
+                continue;
+            }
+
+            if (potencia > maiorMotor) {
+
+                if (maiorMotor > 0) {
+                    somaDemaisMotores += maiorMotor;
+                }
+
+                maiorMotor = potencia;
+
+            } else {
+
+                somaDemaisMotores += potencia;
+            }
+        }
+
+        return maiorMotor +
+                (somaDemaisMotores * 0.50);
     }
 }
