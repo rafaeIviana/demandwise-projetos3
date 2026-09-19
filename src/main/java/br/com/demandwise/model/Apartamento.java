@@ -4,6 +4,10 @@ import jakarta.validation.constraints.AssertTrue;
 
 public class Apartamento {
 
+  public Apartamento(double areaUtil) {
+    this.areaUtil = areaUtil;
+  }
+
   private double areaUtil;
   private double potenciaInstalada;
   private double potenciaRecargaVe;
@@ -11,6 +15,8 @@ public class Apartamento {
 
   public Apartamento() {
   }
+
+  // ...
 
   public Apartamento(double areaUtil, double potenciaInstalada, double potenciaRecargaVe, boolean possuiEstudoDeRede) {
     this.areaUtil = areaUtil;
