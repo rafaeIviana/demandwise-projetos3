@@ -74,44 +74,22 @@ Nesta entrega foi realizada a análise inicial do material disponibilizado pela 
 
 ## Entrega 02
 
-Nesta entrega serão apresentados os resultados do desenvolvimento realizado pela equipe.
+Nesta entrega foram implementadas as primeiras funcionalidades do protótipo, relacionadas às seguintes histórias de usuário:
 
-### Artefatos
+### US-01 — Cálculo automático de demanda
 
-* **Documentação:** [Link]
-* **Screenshots:** [Link]
-* **Outros materiais:** [Link]
+Implementação do cálculo automático de demanda elétrica da edificação, seguindo as regras e fatores definidos na norma DIS-NOR-053.
 
-### Como rodar o projeto
+### US-02 — Alertas explicando por que um valor está fora do padrão
 
-> Esta seção deverá ser preenchida a partir da segunda entrega, quando o protótipo já possuir uma versão executável.
+Implementação da funcionalidade de identificação e explicação de valores que estejam fora dos padrões definidos para o cálculo.
 
-**Pré-requisitos:**
+### Screencasts
 
-* [Tecnologia/versão necessária]
-* [Dependência necessária]
-* [Outra dependência]
+* **Screencast — Demonstração de uso do sistema:** [Assistir no YouTube](https://youtu.be/yrcTqzvEuuk)
 
-**Instalação:**
+* **Screencast — Explicação do código e das histórias implementadas:** [Assistir no YouTube](https://youtu.be/o75v9s-ksvc)
 
-```bash
-# Clonar o repositório
-git clone [LINK_DO_REPOSITORIO]
-
-# Entrar na pasta do projeto
-cd [NOME_DO_PROJETO]
-
-# Instalar as dependências
-[COMANDO]
-```
-
-**Executar o projeto:**
-
-```bash
-[COMANDO PARA EXECUTAR]
-```
-
----
 
 ## Entrega 03 
 
