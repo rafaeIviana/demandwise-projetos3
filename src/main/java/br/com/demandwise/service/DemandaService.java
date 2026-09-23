@@ -4,6 +4,7 @@ import br.com.demandwise.model.Apartamento;
 import br.com.demandwise.model.Edificacao;
 import br.com.demandwise.model.FaixaDemanda;
 import org.springframework.stereotype.Service;
+import java.util.ArrayList;
 
 import java.util.List;
 
@@ -53,59 +54,71 @@ public class DemandaService {
             new FaixaDemanda(1000, 16.93)
     );
 
-    public double calcularDemanda(Edificacao edificacao) {
-
+public ResultadoDemanda calcularDemanda(Edificacao edificacao) {
+    List<CriterioAplicado> memoria = new ArrayList<>();
         List<Apartamento> apartamentos = edificacao.getApartamentos();
 
         if (apartamentos == null || apartamentos.isEmpty()) {
-            return calcularDemandaServico(edificacao);
+    double demandaServicoUnica = calcularDemandaServico(edificacao, memoria);
+    return new ResultadoDemanda(demandaServicoUnica, memoria);
         }
 
         double demandaTotal = 0.0;
 
-        for (Apartamento apartamento : apartamentos) {
-            demandaTotal += calcularDemandaPorArea(apartamento.getAreaUtil());
-        }
+       for (int i = 0; i < apartamentos.size(); i++) {
+    Apartamento apartamento = apartamentos.get(i);
+    demandaTotal += calcularDemandaPorArea(apartamento.getAreaUtil(), i, memoria);
+}
+    
 
         double fatorCoincidencia =
-                obterFatorCoincidencia(apartamentos.size());
+               obterFatorCoincidencia(apartamentos.size(), memoria);
 
         double demandaComCoincidencia =
                 demandaTotal * fatorCoincidencia;
 
         double fatorSeguranca =
-                obterFatorSeguranca(demandaComCoincidencia);
+               obterFatorSeguranca(demandaComCoincidencia, memoria);
 
         double demandaResidencialFinal =
                 demandaComCoincidencia * fatorSeguranca;
 
         double demandaServico =
-                calcularDemandaServico(edificacao);
+               calcularDemandaServico(edificacao, memoria);
 
-        return demandaResidencialFinal + demandaServico;
+       double demandaTotalFinal = demandaResidencialFinal + demandaServico;
+       return new ResultadoDemanda(demandaTotalFinal, memoria);
     }
 
-    private double calcularDemandaPorArea(double areaUtil) {
+private double calcularDemandaPorArea(
+        double areaUtil, int indiceApartamento, List<CriterioAplicado> memoria) {
 
-        if (areaUtil <= 0) {
-            throw new IllegalArgumentException(
-                    "A área útil deve ser maior que zero."
-            );
-        }
-
-        for (FaixaDemanda faixa : QUADRO_35) {
-
-            if (areaUtil <= faixa.getAreaMaxima()) {
-                return faixa.getDemanda();
-            }
-        }
-
+    if (areaUtil <= 0) {
         throw new IllegalArgumentException(
-                "Área útil acima de 1000 m² não possui valor definido no Quadro 35."
+                "A área útil deve ser maior que zero."
         );
     }
 
-    private double obterFatorCoincidencia(int numeroApartamentos) {
+    for (FaixaDemanda faixa : QUADRO_35) {
+
+        if (areaUtil <= faixa.getAreaMaxima()) {
+            memoria.add(new CriterioAplicado(
+                    "QUADRO_35",
+                    "apartamento[" + indiceApartamento + "].areaUtil=" + areaUtil,
+                    "Área útil até " + faixa.getAreaMaxima() + " m² -> demanda unitária "
+                            + faixa.getDemanda() + " kVA",
+                    faixa.getDemanda()
+            ));
+            return faixa.getDemanda();
+        }
+    }
+
+    throw new IllegalArgumentException(
+            "Área útil acima de 1000 m² não possui valor definido no Quadro 35."
+    );
+}
+
+    private double obterFatorCoincidencia(int numeroApartamentos, List<CriterioAplicado> memoria) {
 
         double[] fatores = {
                 1.0000, 0.9800, 0.9730, 0.9700, 0.9680,
@@ -122,35 +135,60 @@ public class DemandaService {
                 0.6911, 0.6888, 0.6866, 0.6844
         };
 
+        double fatorEscolhido;
+        String descricao;
+
         if (numeroApartamentos <= 0) {
-            return 0.0;
+            fatorEscolhido = 0.0;
+            descricao = "Número de apartamentos <= 0 -> fator de coincidência 0.0";
+        } else if (numeroApartamentos <= fatores.length) {
+            fatorEscolhido = fatores[numeroApartamentos - 1];
+            descricao = "Fator de coincidência tabelado para " + numeroApartamentos + " apartamento(s)";
+        } else {
+            fatorEscolhido = 0.6823;
+            descricao = "Acima de " + fatores.length + " apartamentos -> fator mínimo tabelado 0.6823";
         }
 
-        if (numeroApartamentos <= fatores.length) {
-            return fatores[numeroApartamentos - 1];
-        }
+        memoria.add(new CriterioAplicado(
+                "FATOR_COINCIDENCIA",
+                "numeroApartamentos=" + numeroApartamentos,
+                descricao,
+                fatorEscolhido
+        ));
 
-        return 0.6823;
+        return fatorEscolhido;
     }
 
-    private double obterFatorSeguranca(double demanda) {
+private double obterFatorSeguranca(double demanda, List<CriterioAplicado> memoria) {
+
+        double fator;
+        String descricao;
 
         if (demanda <= 25) {
-            return 1.5;
+            fator = 1.5;
+            descricao = "Demanda com coincidência <= 25 kVA -> fator de segurança 1.5";
+        } else if (demanda <= 50) {
+            fator = 1.3;
+            descricao = "Demanda com coincidência <= 50 kVA -> fator de segurança 1.3";
+        } else if (demanda <= 100) {
+            fator = 1.2;
+            descricao = "Demanda com coincidência <= 100 kVA -> fator de segurança 1.2";
+        } else {
+            fator = 1.1;
+            descricao = "Demanda com coincidência > 100 kVA -> fator de segurança 1.1";
         }
 
-        if (demanda <= 50) {
-            return 1.3;
-        }
+        memoria.add(new CriterioAplicado(
+                "FATOR_SEGURANCA",
+                "demandaComCoincidencia=" + demanda,
+                descricao,
+                fator
+        ));
 
-        if (demanda <= 100) {
-            return 1.2;
-        }
-
-        return 1.1;
+        return fator;
     }
 
-    private double calcularDemandaServico(Edificacao edificacao) {
+    private double calcularDemandaServico(Edificacao edificacao, List<CriterioAplicado> memoria) {
 
         double potenciaIluminacao =
                 edificacao.getPotenciaIluminacao();
@@ -171,6 +209,15 @@ public class DemandaService {
             demandaIluminacaoETomadas =
                     (potenciaTotal / 0.80) * 1.00;
 
+            memoria.add(new CriterioAplicado(
+                    "DEMANDA_ILUMINACAO_TOMADAS_4_MOTORES",
+                    "potenciaIluminacao=" + potenciaIluminacao + ", potenciaTomadas=" + potenciaTomadas
+                            + ", numeroMotores=4",
+                    "Edificação com exatamente 4 motores -> iluminação e tomadas somadas com fator de "
+                            + "demanda 1.00 sobre fator de potência 0.80",
+                    demandaIluminacaoETomadas
+            ));
+
         } else {
 
             double demandaIluminacao =
@@ -181,16 +228,24 @@ public class DemandaService {
 
             demandaIluminacaoETomadas =
                     demandaIluminacao + demandaTomadas;
+
+            memoria.add(new CriterioAplicado(
+                    "DEMANDA_ILUMINACAO_TOMADAS_PADRAO",
+                    "potenciaIluminacao=" + potenciaIluminacao + ", potenciaTomadas=" + potenciaTomadas
+                            + ", numeroMotores=" + (motores == null ? 0 : motores.size()),
+                    "Regra padrão: iluminação com fator de demanda 1.00 e tomadas com fator de "
+                            + "demanda 0.50, ambos sobre fator de potência 0.80",
+                    demandaIluminacaoETomadas
+            ));
         }
 
         double demandaMotores =
-                calcularDemandaMotores(motores);
+                calcularDemandaMotores(motores, memoria);
 
         return demandaIluminacaoETomadas + demandaMotores;
     }
-
-    private double calcularDemandaMotores(
-            List<Double> potenciasMotores) {
+private double calcularDemandaMotores(
+        List<Double> potenciasMotores, List<CriterioAplicado> memoria) {
 
         if (potenciasMotores == null ||
                 potenciasMotores.isEmpty()) {
@@ -221,7 +276,16 @@ public class DemandaService {
             }
         }
 
-        return maiorMotor +
-                (somaDemaisMotores * 0.50);
+        double demandaMotores = maiorMotor + (somaDemaisMotores * 0.50);
+
+        memoria.add(new CriterioAplicado(
+                "DEMANDA_MOTORES",
+                "potenciasMotores=" + potenciasMotores,
+                "Maior motor considerado a 100% (" + maiorMotor
+                        + ") + demais motores a 50% (soma=" + somaDemaisMotores + ")",
+                demandaMotores
+        ));
+
+        return demandaMotores;
     }
 }
