@@ -12,6 +12,7 @@ public class Edificacao {
   private double potenciaIluminacao;
   private double potenciaTomadas;
   private List<Double> potenciasMotores;
+  private TipoInstalacao tipoInstalacao = TipoInstalacao.RESIDENCIAL;
 
   public Edificacao() {
   }
@@ -55,5 +56,13 @@ public class Edificacao {
   public int getNumeroApartamentos() {
     return apartamentos == null ? 0 : apartamentos.size();
   }
+  public TipoInstalacao getTipoInstalacao() {
+    return tipoInstalacao;
+  }
+public void setTipoInstalacao(TipoInstalacao tipoInstalacao) {
+    this.tipoInstalacao = tipoInstalacao == null ? TipoInstalacao.RESIDENCIAL : tipoInstalacao;
+ }
+
+
 }
 
