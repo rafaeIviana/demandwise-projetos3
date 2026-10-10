@@ -1,0 +1,190 @@
+:root {
+    --fundo: #f4f6f8;
+    --cartao: #ffffff;
+    --texto: #1f2933;
+    --texto-suave: #52606d;
+    --borda: #cbd2d9;
+    --azul: #1d4ed8;
+    --azul-escuro: #1e40af;
+    --vermelho: #b91c1c;
+    --vermelho-fundo: #fef2f2;
+    --verde: #166534;
+    --verde-fundo: #f0fdf4;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--fundo);
+    color: var(--texto);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.5;
+}
+
+.pagina {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 24px 16px 48px;
+}
+
+h1 {
+    margin: 0 0 4px;
+    font-size: 1.6rem;
+}
+
+h2 {
+    margin: 0 0 12px;
+    font-size: 1.1rem;
+}
+
+.subtitulo {
+    margin: 0 0 20px;
+    color: var(--texto-suave);
+}
+
+.bloco {
+    background: var(--cartao);
+    border: 1px solid var(--borda);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.campo {
+    margin-bottom: 12px;
+}
+
+.campo label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+.asterisco {
+    color: var(--vermelho);
+}
+
+.campo input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--borda);
+    border-radius: 6px;
+    font-size: 1rem;
+    background: #fff;
+}
+
+.campo input:focus-visible {
+    outline: 2px solid var(--azul);
+    outline-offset: 1px;
+}
+
+/* campo obrigatório faltando: borda vermelha, fundo rosado e mensagem embaixo */
+.campo-faltando input {
+    border-color: var(--vermelho);
+    background: var(--vermelho-fundo);
+}
+
+.erro {
+    display: block;
+    min-height: 1.2em;
+    margin-top: 2px;
+    font-size: 0.875rem;
+    color: var(--vermelho);
+}
+
+.erro-lista {
+    margin: 0 0 8px;
+}
+
+.apartamento {
+    border: 1px solid var(--borda);
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 12px;
+}
+
+.apartamento-cabecalho {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.apartamento-titulo {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.btn-remover {
+    background: none;
+    border: none;
+    color: var(--vermelho);
+    cursor: pointer;
+    font-size: 0.9rem;
+    text-decoration: underline;
+}
+
+.btn-secundario {
+    background: #fff;
+    color: var(--azul);
+    border: 1px solid var(--azul);
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.btn-secundario:hover {
+    background: #eff6ff;
+}
+
+.resumo ul {
+    margin: 0;
+    padding-left: 20px;
+    color: var(--vermelho);
+}
+
+.resumo .ok {
+    margin: 0;
+    color: var(--verde);
+    font-weight: 600;
+}
+
+.btn-principal {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    background: var(--azul);
+    color: #fff;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-principal:hover:not(:disabled) {
+    background: var(--azul-escuro);
+}
+
+/* botão bloqueado enquanto faltar dado obrigatório */
+.btn-principal:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+.mensagem {
+    margin: 12px 0 0;
+    min-height: 1.5em;
+    font-weight: 600;
+}
+
+.mensagem-ok {
+    color: var(--verde);
+}
+
+.mensagem-erro {
+    color: var(--vermelho);
+}
