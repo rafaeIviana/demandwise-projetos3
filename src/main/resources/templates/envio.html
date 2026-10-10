@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>DemandWise - Envio do projeto</title>
+    <link rel="stylesheet" th:href="@{/css/envio.css}">
+</head>
+<body>
+<main class="pagina">
+    <h1>Envio do projeto</h1>
+    <p class="subtitulo">
+        Preencha todos os campos obrigatórios (<span class="asterisco">*</span>).
+        O envio só é liberado quando não houver nenhum campo faltando.
+    </p>
+
+    <form id="form-envio" novalidate>
+
+        <section class="bloco">
+            <h2>Dados gerais da edificação</h2>
+
+            <div class="campo" data-campo="iluminacao">
+                <label for="iluminacao">Potência de iluminação (kW) <span class="asterisco">*</span></label>
+                <input type="number" id="iluminacao" min="0" step="any" inputmode="decimal"
+                       aria-describedby="erro-iluminacao">
+                <span class="erro" id="erro-iluminacao"></span>
+            </div>
+
+            <div class="campo" data-campo="tomadas">
+                <label for="tomadas">Potência de tomadas (kW) <span class="asterisco">*</span></label>
+                <input type="number" id="tomadas" min="0" step="any" inputmode="decimal"
+                       aria-describedby="erro-tomadas">
+                <span class="erro" id="erro-tomadas"></span>
+            </div>
+        </section>
+
+        <section class="bloco">
+            <h2>Apartamentos</h2>
+            <div id="lista-apartamentos"></div>
+            <p class="erro erro-lista" id="erro-apartamentos"></p>
+            <button type="button" id="btn-adicionar" class="btn-secundario">+ Adicionar apartamento</button>
+        </section>
+
+        <section class="bloco resumo" aria-live="polite">
+            <h2>Pendências</h2>
+            <p id="resumo-ok" class="ok" hidden>Tudo preenchido. O envio está liberado.</p>
+            <ul id="lista-pendencias"></ul>
+        </section>
+
+        <button type="submit" id="btn-enviar" class="btn-principal" disabled>Enviar projeto</button>
+        <p id="mensagem" class="mensagem" role="status"></p>
+    </form>
+</main>
+
+<script th:src="@{/js/envio.js}"></script>
+</body>
+</html>
