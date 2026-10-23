@@ -1,3 +1,4 @@
+
 package br.com.demandwise.controller;
 
 import br.com.demandwise.model.Edificacao;
@@ -24,18 +25,33 @@ public class DemandaController {
     @PostMapping("/calcular")
     public ResponseEntity<?> calcular(@RequestBody Edificacao edificacao) {
         TipoInstalacao tipo = edificacao.getTipoInstalacao();
-
-        // tipos ainda nao implementados respondem "em breve" em vez de calcular com regra errada
         if (!tipo.isDisponivel()) {
             return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(Map.of(
-                    "mensagem", "O cálculo para instalação do tipo " + tipo.getDescricao()
-                            + " estará disponível em breve. Nesta fase, apenas o tipo Residencial está implementado."));
+                    "mensagem", "O cálculo para instalação do tipo "
+                            + tipo.getDescricao()
+                            + " estará disponível em breve. "
+                            + "Nesta fase, apenas o tipo Residencial está implementado."
+            ));
         }
 
-        ResultadoDemanda resultado = demandaService.calcularDemanda(edificacao);
+        try {
+            ResultadoDemanda resultado =
+                    demandaService.calcularDemanda(edificacao);
 
-        double demandaArredondada = Math.round(resultado.demandaTotal() * 100.0) / 100.0;
+            double demandaArredondada =
+                    Math.round(resultado.demandaTotal() * 100.0) / 100.0;
 
-        return ResponseEntity.ok(new ResultadoDemanda(demandaArredondada, resultado.memoriaCalculo()));
+            return ResponseEntity.ok(
+                    new ResultadoDemanda(
+                            demandaArredondada,
+                            resultado.memoriaCalculo()
+                    )
+            );
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "mensagem", e.getMessage()
+            ));
+        }
     }
 }

@@ -1,56 +1,211 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>DemandWise - Envio do projeto</title>
-    <link rel="stylesheet" th:href="@{/css/envio.css}">
+    <title>DemandWise — Novo projeto</title>
+    <link rel="stylesheet" th:href="@{/css/envio.css(v='20261023-1')}">
 </head>
 <body>
-<main class="pagina">
-    <h1>Envio do projeto</h1>
-    <p class="subtitulo">
-        Preencha todos os campos obrigatórios (<span class="asterisco">*</span>).
-        O envio só é liberado quando não houver nenhum campo faltando.
-    </p>
+<div class="app">
+    <aside class="sidebar">
+        <a class="marca" th:href="@{/envio}">
+            <span class="marca-icone">D</span>
+            <span>Demand<span class="marca-destaque">Wise</span></span>
+        </a>
 
-    <form id="form-envio" novalidate>
+        <p class="nav-titulo">WORKSPACE</p>
+        <nav class="navegacao" aria-label="Navegação principal">
+            <a class="nav-item ativo" th:href="@{/envio}">
+                <span class="nav-icone">▦</span>
+                Novo projeto
+            </a>
+            <a class="nav-item" href="#form-envio">
+                <span class="nav-icone">▤</span>
+                Formulário
+            </a>
+        </nav>
 
-        <section class="bloco">
-            <h2>Dados gerais da edificação</h2>
+        <div class="sidebar-ajuda">
+            <span class="ajuda-icone">i</span>
+            <strong>Precisa de ajuda?</strong>
+            <p>Preencha os dados do projeto para preparar o cálculo de demanda.</p>
+        </div>
 
-            <div class="campo" data-campo="iluminacao">
-                <label for="iluminacao">Potência de iluminação (kW) <span class="asterisco">*</span></label>
-                <input type="number" id="iluminacao" min="0" step="any" inputmode="decimal"
-                       aria-describedby="erro-iluminacao">
-                <span class="erro" id="erro-iluminacao"></span>
+        <div class="perfil">
+            <span class="avatar">DW</span>
+            <span class="perfil-texto">
+                <strong>DemandWise</strong>
+                <small>Automação de demanda</small>
+            </span>
+        </div>
+    </aside>
+
+    <main class="conteudo">
+        <header class="topbar">
+            <div class="breadcrumb">
+                <span>Projetos</span>
+                <span class="breadcrumb-separador">/</span>
+                <strong>Novo projeto</strong>
             </div>
+            <span class="status-rascunho">
+                <span class="status-ponto"></span>
+                Novo cálculo
+            </span>
+        </header>
 
-            <div class="campo" data-campo="tomadas">
-                <label for="tomadas">Potência de tomadas (kW) <span class="asterisco">*</span></label>
-                <input type="number" id="tomadas" min="0" step="any" inputmode="decimal"
-                       aria-describedby="erro-tomadas">
-                <span class="erro" id="erro-tomadas"></span>
-            </div>
-        </section>
+        <div class="pagina">
+            <section class="introducao">
+                <div>
+                    <p class="sobretitulo">ÁREA DE PROJETOS <span>•</span> NOVO CÁLCULO</p>
+                    <h1>Vamos começar seu projeto.</h1>
+                    <p class="subtitulo">
+                        Informe os dados da edificação para preparar o cálculo de demanda elétrica.
+                    </p>
+                </div>
+                <div class="etapa-badge">
+                    <span class="etapa-numero">01</span>
+                    <span>Dados do projeto</span>
+                </div>
+            </section>
 
-        <section class="bloco">
-            <h2>Apartamentos</h2>
-            <div id="lista-apartamentos"></div>
-            <p class="erro erro-lista" id="erro-apartamentos"></p>
-            <button type="button" id="btn-adicionar" class="btn-secundario">+ Adicionar apartamento</button>
-        </section>
+            <section class="progresso" aria-label="Progresso do formulário">
+                <div class="progresso-topo">
+                    <span>Preenchimento do projeto</span>
+                    <span class="progresso-etapa">Etapa 1 de 3</span>
+                </div>
+                <div class="progresso-trilho">
+                    <div class="progresso-valor"></div>
+                </div>
+                <div class="progresso-legendas">
+                    <span class="legenda-ativa">Dados gerais</span>
+                    <span>Apartamentos</span>
+                    <span>Revisão</span>
+                </div>
+            </section>
 
-        <section class="bloco resumo" aria-live="polite">
-            <h2>Pendências</h2>
-            <p id="resumo-ok" class="ok" hidden>Tudo preenchido. O envio está liberado.</p>
-            <ul id="lista-pendencias"></ul>
-        </section>
+            <form id="form-envio" novalidate>
+                <div class="layout-formulario">
+                    <div class="coluna-formulario">
+                        <section class="bloco">
+                            <div class="bloco-cabecalho">
+                                <span class="bloco-icone">01</span>
+                                <div>
+                                    <h2>Dados gerais da edificação</h2>
+                                    <p>Informe as potências previstas para as áreas comuns.</p>
+                                </div>
+                            </div>
 
-        <button type="submit" id="btn-enviar" class="btn-principal" disabled>Enviar projeto</button>
-        <p id="mensagem" class="mensagem" role="status"></p>
-    </form>
-</main>
+                            <div class="campos-grid">
+                                <div class="campo" data-campo="iluminacao">
+                                    <label for="iluminacao">
+                                        Potência de iluminação <span class="asterisco">*</span>
+                                    </label>
+                                    <div class="input-unidade">
+                                        <input type="number" id="iluminacao" min="0"
+                                               step="any" inputmode="decimal"
+                                               placeholder="Ex.: 12,5"
+                                               aria-describedby="erro-iluminacao">
+                                        <span>kW</span>
+                                    </div>
+                                    <span class="ajuda-campo">Potência total prevista para iluminação.</span>
+                                    <span class="erro" id="erro-iluminacao"></span>
+                                </div>
+
+                                <div class="campo" data-campo="tomadas">
+                                    <label for="tomadas">
+                                        Potência de tomadas <span class="asterisco">*</span>
+                                    </label>
+                                    <div class="input-unidade">
+                                        <input type="number" id="tomadas" min="0"
+                                               step="any" inputmode="decimal"
+                                               placeholder="Ex.: 8,0"
+                                               aria-describedby="erro-tomadas">
+                                        <span>kW</span>
+                                    </div>
+                                    <span class="ajuda-campo">Potência total prevista para tomadas.</span>
+                                    <span class="erro" id="erro-tomadas"></span>
+                                </div>
+                            </div>
+                            <p class="nota-campos">
+                                <span class="asterisco">*</span>
+                                Campos obrigatórios
+                            </p>
+                        </section>
+
+                        <section class="bloco">
+                            <div class="bloco-cabecalho bloco-cabecalho-apartamentos">
+                                <span class="bloco-icone">02</span>
+                                <div>
+                                    <h2>Unidades consumidoras</h2>
+                                    <p>Adicione os apartamentos que fazem parte da edificação.</p>
+                                </div>
+                            </div>
+
+                            <div id="lista-apartamentos"></div>
+                            <p class="erro erro-lista" id="erro-apartamentos"></p>
+
+                            <button type="button" id="btn-adicionar" class="btn-secundario">
+                                <span class="mais">+</span>
+                                Adicionar apartamento
+                            </button>
+                        </section>
+
+                        <div class="rodape-formulario">
+                            <span><span class="asterisco">*</span> Preencha todos os campos obrigatórios.</span>
+                            <button type="submit" id="btn-enviar" class="btn-principal" disabled>
+                                Enviar projeto
+                                <span aria-hidden="true">→</span>
+                            </button>
+                        </div>
+                        <p id="mensagem" class="mensagem" role="status"></p>
+                    </div>
+
+                    <aside class="coluna-resumo">
+                        <section class="bloco resumo" aria-live="polite">
+                            <div class="resumo-cabecalho">
+                                <div>
+                                    <p class="resumo-sobretitulo">ACOMPANHAMENTO</p>
+                                    <h2>Checklist do projeto</h2>
+                                </div>
+                                <span id="icone-checklist" class="check-icone" role="img"
+                                      aria-label="Checklist em atualização">…</span>
+                            </div>
+
+                            <p class="resumo-descricao">
+                                Acompanhe os dados necessários para liberar o envio.
+                            </p>
+
+                            <div class="resumo-contagem">
+                                <span>Itens pendentes</span>
+                                <strong id="contagem-pendencias">—</strong>
+                            </div>
+                            <ul id="lista-pendencias"></ul>
+                            <p id="resumo-ok" class="ok" hidden>
+                                Tudo preenchido. O envio está liberado.
+                            </p>
+                        </section>
+
+                        <section class="dica-card">
+                            <span class="dica-icone">✳</span>
+                            <h3>Uma etapa de cada vez.</h3>
+                            <p>
+                                Confira os valores informados. O sistema verifica os campos
+                                obrigatórios antes de permitir o envio.
+                            </p>
+                        </section>
+                    </aside>
+                </div>
+            </form>
+
+            <footer class="rodape-pagina">
+                <span>DemandWise <span class="rodape-ponto">·</span> Cálculo de demanda elétrica</span>
+                <span>Preencha os dados com atenção.</span>
+            </footer>
+        </div>
+    </main>
+</div>
 
 <script th:src="@{/js/envio.js}"></script>
 </body>

@@ -7,8 +7,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 
 import java.util.List;
-
-//essa classe é a parte responsável por executar as regras do cálculo de demanda
 @Service
 public class DemandaService {
 

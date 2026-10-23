@@ -17,8 +17,6 @@ public class ChecklistController {
     public ChecklistResponse verificar(@RequestBody Edificacao edificacao) {
         return montarChecklist(edificacao);
     }
-
-    // so libera o envio se o checklist estiver completo
     @PostMapping("/enviar")
     public ResponseEntity<ChecklistResponse> enviar(@RequestBody Edificacao edificacao) {
         ChecklistResponse checklist = montarChecklist(edificacao);
