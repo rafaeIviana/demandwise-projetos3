@@ -1,18 +1,28 @@
+
 package br.com.demandwise.controller;
 
-import br.com.demandwise.model.Edificacao;
-import org.junit.jupiter.api.Test;
 import br.com.demandwise.model.Apartamento;
+import br.com.demandwise.model.Edificacao;
+import br.com.demandwise.service.DemandaService;
+import br.com.demandwise.service.ProjetoPreValidadoService;
+import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ChecklistControllerTest {
 
+    private ChecklistController criarController() {
+        return new ChecklistController(
+                new DemandaService(),
+                new ProjetoPreValidadoService()
+        );
+    }
+
     @Test
     void deveBloquearEnvioQuandoNaoHouverApartamentos() {
-
-        ChecklistController controller = new ChecklistController();
+        ChecklistController controller = criarController();
         Edificacao edificacao = new Edificacao();
 
         var resultado = controller.verificar(edificacao);
@@ -21,105 +31,91 @@ class ChecklistControllerTest {
     }
 
     @Test
-void deveIdentificarPendenciaNoApartamento() {
+    void deveIdentificarPendenciaNoApartamento() {
+        ChecklistController controller = criarController();
+        Edificacao edificacao = new Edificacao();
 
-    ChecklistController controller = new ChecklistController();
+        Apartamento apartamento = new Apartamento();
+        apartamento.setAreaUtil(0);
+        apartamento.setPotenciaInstalada(10);
 
-    Edificacao edificacao = new Edificacao();
+        edificacao.setApartamentos(java.util.List.of(apartamento));
+        edificacao.setPotenciaIluminacao(10);
+        edificacao.setPotenciaTomadas(10);
 
-    Apartamento apartamento = new Apartamento();
-    apartamento.setAreaUtil(0);
-    apartamento.setPotenciaInstalada(10);
+        var resultado = controller.verificar(edificacao);
 
-    edificacao.setApartamentos(java.util.List.of(apartamento));
-    edificacao.setPotenciaIluminacao(10);
-    edificacao.setPotenciaTomadas(10);
+        assertFalse(resultado.liberadoParaEnvio());
+        assertTrue(resultado.pendencias().contains(
+                "Apartamento 1: área útil não informada"));
+    }
 
-    var resultado = controller.verificar(edificacao);
+    @Test
+    void deveIdentificarPendenciaDeIluminacaoETomadas() {
+        ChecklistController controller = criarController();
+        Edificacao edificacao = new Edificacao();
 
-    assertFalse(resultado.liberadoParaEnvio());
-    assertTrue(resultado.pendencias().contains("Apartamento 1: área útil não informada"));
-}
+        Apartamento apartamento = new Apartamento();
+        apartamento.setAreaUtil(40);
+        apartamento.setPotenciaInstalada(10);
 
-@Test
-void deveIdentificarPendenciaDeIluminacaoETomadas() {
+        edificacao.setApartamentos(java.util.List.of(apartamento));
+        edificacao.setPotenciaIluminacao(0);
+        edificacao.setPotenciaTomadas(0);
 
-    ChecklistController controller = new ChecklistController();
+        var resultado = controller.verificar(edificacao);
 
-    Edificacao edificacao = new Edificacao();
+        assertFalse(resultado.liberadoParaEnvio());
+        assertTrue(resultado.pendencias().contains(
+                "Potência de iluminação não informada"));
+        assertTrue(resultado.pendencias().contains(
+                "Potência de tomadas não informada"));
+    }
 
-    Apartamento apartamento = new Apartamento();
-    apartamento.setAreaUtil(40);
-    apartamento.setPotenciaInstalada(10);
+    @Test
+    void deveLiberarEnvioQuandoChecklistEstiverCompleto() {
+        ChecklistController controller = criarController();
+        Edificacao edificacao = new Edificacao();
 
-    edificacao.setApartamentos(java.util.List.of(apartamento));
+        Apartamento apartamento = new Apartamento();
+        apartamento.setAreaUtil(40);
+        apartamento.setPotenciaInstalada(10);
 
-    edificacao.setPotenciaIluminacao(0);
-    edificacao.setPotenciaTomadas(0);
+        edificacao.setApartamentos(java.util.List.of(apartamento));
+        edificacao.setPotenciaIluminacao(10);
+        edificacao.setPotenciaTomadas(10);
 
-    var resultado = controller.verificar(edificacao);
+        var resultado = controller.verificar(edificacao);
 
-    assertFalse(resultado.liberadoParaEnvio());
+        assertTrue(resultado.liberadoParaEnvio());
+        assertTrue(resultado.pendencias().isEmpty());
+    }
 
-    assertTrue(resultado.pendencias().contains(
-            "Potência de iluminação não informada"
-    ));
+    @Test
+    void deveRetornar400QuandoChecklistEstiverIncompleto() {
+        ChecklistController controller = criarController();
+        Edificacao edificacao = new Edificacao();
 
-    assertTrue(resultado.pendencias().contains(
-            "Potência de tomadas não informada"
-    ));
-}
+        var resposta = controller.enviar(edificacao);
 
-@Test
-void deveLiberarEnvioQuandoChecklistEstiverCompleto() {
+        assertEquals(400, resposta.getStatusCode().value());
+    }
 
-    ChecklistController controller = new ChecklistController();
+    @Test
+    void deveRetornar200QuandoChecklistEstiverCompleto() {
+        ChecklistController controller = criarController();
+        Edificacao edificacao = new Edificacao();
 
-    Edificacao edificacao = new Edificacao();
+        Apartamento apartamento = new Apartamento();
+        apartamento.setAreaUtil(40);
+        apartamento.setPotenciaInstalada(10);
 
-    Apartamento apartamento = new Apartamento();
-    apartamento.setAreaUtil(40);
-    apartamento.setPotenciaInstalada(10);
+        edificacao.setApartamentos(java.util.List.of(apartamento));
+        edificacao.setPotenciaIluminacao(10);
+        edificacao.setPotenciaTomadas(10);
 
-    edificacao.setApartamentos(java.util.List.of(apartamento));
-    edificacao.setPotenciaIluminacao(10);
-    edificacao.setPotenciaTomadas(10);
+        var resposta = controller.enviar(edificacao);
 
-    var resultado = controller.verificar(edificacao);
-
-    assertTrue(resultado.liberadoParaEnvio());
-    assertTrue(resultado.pendencias().isEmpty());
-}
-
-@Test
-void deveRetornar400QuandoChecklistEstiverIncompleto() {
-
-    ChecklistController controller = new ChecklistController();
-
-    Edificacao edificacao = new Edificacao();
-
-    var resposta = controller.enviar(edificacao);
-
-    assertEquals(400, resposta.getStatusCode().value());
-}
-
-@Test
-void deveRetornar200QuandoChecklistEstiverCompleto() {
-
-    ChecklistController controller = new ChecklistController();
-
-    Edificacao edificacao = new Edificacao();
-
-    Apartamento apartamento = new Apartamento();
-    apartamento.setAreaUtil(40);
-    apartamento.setPotenciaInstalada(10);
-
-    edificacao.setApartamentos(java.util.List.of(apartamento));
-    edificacao.setPotenciaIluminacao(10);
-    edificacao.setPotenciaTomadas(10);
-
-    var resposta = controller.enviar(edificacao);
-
-    assertEquals(200, resposta.getStatusCode().value());
-}
+        assertEquals(200, resposta.getStatusCode().value());
+    }
 }
