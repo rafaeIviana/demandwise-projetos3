@@ -91,13 +91,25 @@ Implementação da funcionalidade de identificação e explicação de valores q
 * **Screencast — Explicação do código e das histórias implementadas:** [Assistir no YouTube](https://youtu.be/o75v9s-ksvc)
 
 
-## Entrega 03 
+## Entrega 03 — Evolução do protótipo
 
-### Artefatos
+Nesta entrega, o protótipo do DemandWise foi ampliado com novas funcionalidades e melhorias na validação dos dados, na identificação de pendências e na geração de relatórios. Também foram realizados testes para verificar o comportamento de funcionalidades implementadas.
 
-* **Documentação:** [Link]
-* **Screenshots:** [Link]
-* **Outros materiais:** [Link]
+### Histórias de usuário contempladas
+
+- **US-03 — Checklist automático das Pendências MUC:** implementação da funcionalidade de checklist para auxiliar na identificação de pendências.
+- **US-04 — Padronização entre analistas:** desenvolvimento de regras e validações para contribuir com a padronização do processo de análise.
+- **US-06 — Validação impede envio com dado obrigatório faltante:** implementação de validações para impedir o envio quando houver informações obrigatórias ausentes.
+- **US-07 — Geração automática do relatório final de cálculo:** implementação da geração de relatório em PDF com os resultados do cálculo.
+- **US-11 — Seleção de tipo de instalação aplicando regras automaticamente:** implementação da seleção do tipo de instalação para orientar a aplicação das regras correspondentes.
+
+### Screencasts
+
+- **Screencast — Demonstração de uso do sistema:** [Assistir no YouTube](https://youtu.be/SKhwtX0g32c)
+- **Screencast — Explicação do código e das histórias implementadas:** [Assistir no YouTube](https://youtu.be/FAqI80lYYjY)
+---
+
+**Status da entrega:** funcionalidades em desenvolvimento e validação contínua.
 
 ---
 
