@@ -23,7 +23,6 @@ public class ChecklistController {
     public ChecklistResponse verificar(@RequestBody Edificacao edificacao) {
         return checklistService.verificar(edificacao);
     }
-
     @PostMapping("/enviar")
     public ResponseEntity<ChecklistResponse> enviar(@RequestBody Edificacao edificacao) {
         ChecklistResponse checklist = checklistService.verificar(edificacao);
