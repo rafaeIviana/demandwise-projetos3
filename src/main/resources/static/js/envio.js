@@ -9,9 +9,13 @@ const listaApartamentos = document.getElementById("lista-apartamentos");
 const erroApartamentos = document.getElementById("erro-apartamentos");
 const listaPendencias = document.getElementById("lista-pendencias");
 const resumoOk = document.getElementById("resumo-ok");
+const contadorPendencias = document.getElementById("contador-pendencias");
+const indicadorChecklist = document.getElementById("indicador-checklist");
 const botaoEnviar = document.getElementById("btn-enviar");
+const botaoRelatorio = document.getElementById("btn-relatorio-pdf");
 const botaoAdicionar = document.getElementById("btn-adicionar");
 const mensagem = document.getElementById("mensagem");
+let gerandoRelatorio = false;
 
 // mesma regra do ChecklistController: vazio ou <= 0 conta como não informado
 function valorFaltando(input) {
@@ -92,13 +96,15 @@ function adicionarApartamento() {
 
 // confere tudo, pinta os campos faltando, atualiza o resumo e liga/desliga o botão
 function validar() {
-    const pendencias = [];
+    const requisitos = [];
 
-    marcarCampo(campoIluminacao, valorFaltando(campoIluminacao), textoDoErro(campoIluminacao));
-    if (valorFaltando(campoIluminacao)) pendencias.push("Potência de iluminação");
+    const iluminacaoFaltando = valorFaltando(campoIluminacao);
+    marcarCampo(campoIluminacao, iluminacaoFaltando, textoDoErro(campoIluminacao));
+    requisitos.push({ texto: "Potência de iluminação", concluido: !iluminacaoFaltando });
 
-    marcarCampo(campoTomadas, valorFaltando(campoTomadas), textoDoErro(campoTomadas));
-    if (valorFaltando(campoTomadas)) pendencias.push("Potência de tomadas");
+    const tomadasFaltando = valorFaltando(campoTomadas);
+    marcarCampo(campoTomadas, tomadasFaltando, textoDoErro(campoTomadas));
+    requisitos.push({ texto: "Potência de tomadas", concluido: !tomadasFaltando });
 
     const linhas = listaApartamentos.querySelectorAll(".apartamento");
     linhas.forEach((linha, i) => {
@@ -108,33 +114,74 @@ function validar() {
         const area = linha.querySelector(".area-util");
         const potencia = linha.querySelector(".potencia-instalada");
 
-        marcarCampo(area, valorFaltando(area), textoDoErro(area));
-        if (valorFaltando(area)) pendencias.push("Apartamento " + numero + " - área útil");
+        const areaFaltando = valorFaltando(area);
+        marcarCampo(area, areaFaltando, textoDoErro(area));
+        requisitos.push({
+            texto: "Apartamento " + numero + " - área útil",
+            concluido: !areaFaltando
+        });
 
-        marcarCampo(potencia, valorFaltando(potencia), textoDoErro(potencia));
-        if (valorFaltando(potencia)) pendencias.push("Apartamento " + numero + " - potência instalada");
+        const potenciaFaltando = valorFaltando(potencia);
+        marcarCampo(potencia, potenciaFaltando, textoDoErro(potencia));
+        requisitos.push({
+            texto: "Apartamento " + numero + " - potência instalada",
+            concluido: !potenciaFaltando
+        });
     });
 
     if (linhas.length === 0) {
         erroApartamentos.textContent = "Adicione pelo menos um apartamento";
-        pendencias.push("Apartamentos da edificação");
+        requisitos.push({ texto: "Adicionar pelo menos um apartamento", concluido: false });
     } else {
         erroApartamentos.textContent = "";
     }
 
-    mostrarPendencias(pendencias);
+    mostrarChecklist(requisitos);
+    const pendencias = requisitos.filter(requisito => !requisito.concluido);
     botaoEnviar.disabled = pendencias.length > 0;
-    return pendencias;
+    botaoRelatorio.disabled = pendencias.length > 0 || gerandoRelatorio;
+    return pendencias.map(requisito => requisito.texto);
 }
 
-function mostrarPendencias(pendencias) {
+function mostrarChecklist(requisitos) {
     listaPendencias.replaceChildren();
-    pendencias.forEach(texto => {
+    requisitos.forEach(requisito => {
         const item = document.createElement("li");
-        item.textContent = texto;
+        const estado = requisito.concluido ? "concluido" : "pendente";
+        item.className = "item-checklist item-checklist--" + estado;
+
+        const texto = document.createElement("span");
+        texto.className = "item-checklist-requisito";
+        texto.textContent = requisito.texto;
+
+        const indicador = document.createElement("span");
+        indicador.className = "item-checklist-estado";
+
+        const icone = document.createElement("span");
+        icone.className = "item-checklist-icone";
+        icone.setAttribute("aria-hidden", "true");
+        icone.textContent = requisito.concluido ? "✓" : "!";
+
+        const rotuloEstado = document.createElement("span");
+        rotuloEstado.textContent = requisito.concluido ? "Concluído" : "Pendente";
+        indicador.append(icone, rotuloEstado);
+        item.append(texto, indicador);
         listaPendencias.appendChild(item);
     });
-    resumoOk.hidden = pendencias.length > 0;
+
+    const pendencias = requisitos.filter(requisito => !requisito.concluido).length;
+    const completo = pendencias === 0;
+    contadorPendencias.textContent = pendencias === 1
+        ? "1 pendência"
+        : pendencias + " pendências";
+    resumoOk.hidden = !completo;
+
+    indicadorChecklist.className = "indicador-checklist indicador-checklist--"
+        + (completo ? "concluido" : "pendente");
+    indicadorChecklist.querySelector(".indicador-checklist-icone").textContent = completo ? "✓" : "!";
+    indicadorChecklist.querySelector(".indicador-checklist-texto").textContent = completo
+        ? "Concluído"
+        : "Em andamento";
 }
 
 function montarEdificacao() {
@@ -173,8 +220,10 @@ form.addEventListener("submit", async (evento) => {
             // o servidor recusou: mostra as pendências que ele encontrou
             const checklist = await resposta.json().catch(() => null);
             mensagem.classList.add("mensagem-erro");
-            mensagem.textContent = "Envio recusado pelo servidor. Corrija as pendências abaixo.";
-            if (checklist && checklist.pendencias) mostrarPendencias(checklist.pendencias);
+            const pendenciasServidor = checklist?.pendencias?.join("; ");
+            mensagem.textContent = pendenciasServidor
+                ? "Envio recusado pelo servidor. Pendências: " + pendenciasServidor
+                : "Envio recusado pelo servidor. Corrija as pendências indicadas.";
         }
     } catch (erro) {
         mensagem.classList.add("mensagem-erro");
@@ -182,6 +231,62 @@ form.addEventListener("submit", async (evento) => {
     } finally {
         // só reabilita se a tela ainda estiver completa
         botaoEnviar.disabled = validar().length > 0;
+    }
+});
+
+botaoRelatorio.addEventListener("click", async () => {
+    mensagem.className = "mensagem";
+    mensagem.textContent = "";
+
+    if (validar().length > 0) {
+        mensagem.classList.add("mensagem-erro");
+        mensagem.textContent = "Preencha os campos obrigatórios antes de gerar o relatório.";
+        return;
+    }
+
+    const edificacao = montarEdificacao();
+    gerandoRelatorio = true;
+    botaoRelatorio.disabled = true;
+    mensagem.textContent = "Gerando relatório PDF...";
+
+    try {
+        const resposta = await fetch("/api/relatorio/pdf", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(edificacao)
+        });
+
+        if (!resposta.ok) {
+            const erro = await resposta.json().catch(() => null);
+            const texto = erro?.pendencias?.length
+                ? erro.pendencias.join("; ")
+                : erro?.mensagem || "O servidor recusou a geração do relatório.";
+            throw new Error(texto);
+        }
+
+        const tipoConteudo = resposta.headers.get("Content-Type") || "";
+        if (!tipoConteudo.toLowerCase().includes("application/pdf")) {
+            throw new Error("O servidor não retornou um arquivo PDF válido.");
+        }
+
+        const arquivo = await resposta.blob();
+        const url = URL.createObjectURL(arquivo);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "relatorio-calculo-demanda.pdf";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+        mensagem.classList.add("mensagem-ok");
+        mensagem.textContent = "Relatório PDF gerado e download iniciado.";
+    } catch (erro) {
+        mensagem.classList.add("mensagem-erro");
+        mensagem.textContent = erro.message || "Não foi possível gerar o relatório PDF.";
+    } finally {
+        gerandoRelatorio = false;
+        botaoRelatorio.disabled = validar().length > 0;
     }
 });
 

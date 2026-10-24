@@ -1,6 +1,7 @@
 package br.com.demandwise.controller;
 
 import br.com.demandwise.model.Edificacao;
+import br.com.demandwise.service.ChecklistService;
 import org.junit.jupiter.api.Test;
 import br.com.demandwise.model.Apartamento;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -12,7 +13,7 @@ class ChecklistControllerTest {
     @Test
     void deveBloquearEnvioQuandoNaoHouverApartamentos() {
 
-        ChecklistController controller = new ChecklistController();
+        ChecklistController controller = new ChecklistController(new ChecklistService());
         Edificacao edificacao = new Edificacao();
 
         var resultado = controller.verificar(edificacao);
@@ -23,7 +24,7 @@ class ChecklistControllerTest {
     @Test
 void deveIdentificarPendenciaNoApartamento() {
 
-    ChecklistController controller = new ChecklistController();
+    ChecklistController controller = new ChecklistController(new ChecklistService());
 
     Edificacao edificacao = new Edificacao();
 
@@ -44,7 +45,7 @@ void deveIdentificarPendenciaNoApartamento() {
 @Test
 void deveIdentificarPendenciaDeIluminacaoETomadas() {
 
-    ChecklistController controller = new ChecklistController();
+    ChecklistController controller = new ChecklistController(new ChecklistService());
 
     Edificacao edificacao = new Edificacao();
 
@@ -73,7 +74,7 @@ void deveIdentificarPendenciaDeIluminacaoETomadas() {
 @Test
 void deveLiberarEnvioQuandoChecklistEstiverCompleto() {
 
-    ChecklistController controller = new ChecklistController();
+    ChecklistController controller = new ChecklistController(new ChecklistService());
 
     Edificacao edificacao = new Edificacao();
 
@@ -94,7 +95,7 @@ void deveLiberarEnvioQuandoChecklistEstiverCompleto() {
 @Test
 void deveRetornar400QuandoChecklistEstiverIncompleto() {
 
-    ChecklistController controller = new ChecklistController();
+    ChecklistController controller = new ChecklistController(new ChecklistService());
 
     Edificacao edificacao = new Edificacao();
 
@@ -106,7 +107,7 @@ void deveRetornar400QuandoChecklistEstiverIncompleto() {
 @Test
 void deveRetornar200QuandoChecklistEstiverCompleto() {
 
-    ChecklistController controller = new ChecklistController();
+    ChecklistController controller = new ChecklistController(new ChecklistService());
 
     Edificacao edificacao = new Edificacao();
 

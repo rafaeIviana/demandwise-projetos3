@@ -34,8 +34,9 @@ public class DemandaController {
 
         ResultadoDemanda resultado = demandaService.calcularDemanda(edificacao);
 
-        double demandaArredondada = Math.round(resultado.demandaTotal() * 100.0) / 100.0;
-
-        return ResponseEntity.ok(new ResultadoDemanda(demandaArredondada, resultado.memoriaCalculo()));
+        return ResponseEntity.ok(new ResultadoDemanda(
+                resultado.demandaTotalArredondada(),
+                resultado.memoriaCalculo()
+        ));
     }
 }

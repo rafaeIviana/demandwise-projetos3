@@ -42,12 +42,22 @@
         </section>
 
         <section class="bloco resumo" aria-live="polite">
-            <h2>Pendências</h2>
+            <div class="resumo-cabecalho">
+                <h2>Pendências</h2>
+                <span id="indicador-checklist" class="indicador-checklist indicador-checklist--pendente">
+                    <span class="indicador-checklist-icone" aria-hidden="true">!</span>
+                    <span class="indicador-checklist-texto">Em andamento</span>
+                </span>
+            </div>
+            <p id="contador-pendencias" class="contador-pendencias" aria-live="polite"></p>
             <p id="resumo-ok" class="ok" hidden>Tudo preenchido. O envio está liberado.</p>
-            <ul id="lista-pendencias"></ul>
+            <ul id="lista-pendencias" class="lista-pendencias"></ul>
         </section>
 
         <button type="submit" id="btn-enviar" class="btn-principal" disabled>Enviar projeto</button>
+        <button type="button" id="btn-relatorio-pdf" class="btn-secundario btn-relatorio" disabled>
+            Baixar relatório em PDF
+        </button>
         <p id="mensagem" class="mensagem" role="status"></p>
     </form>
 </main>
