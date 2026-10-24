@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>DemandWise — Novo projeto</title>
-    <link rel="stylesheet" th:href="@{/css/envio.css(v='20261023-1')}">
+    <link rel="stylesheet" th:href="@{/css/envio.css(v='20261023-2')}">
 </head>
 <body>
 <div class="app">
@@ -154,10 +154,16 @@
 
                         <div class="rodape-formulario">
                             <span><span class="asterisco">*</span> Preencha todos os campos obrigatórios.</span>
-                            <button type="submit" id="btn-enviar" class="btn-principal" disabled>
-                                Enviar projeto
-                                <span aria-hidden="true">→</span>
-                            </button>
+                            <div class="acoes-formulario">
+                                <button type="submit" id="btn-enviar" class="btn-principal" disabled>
+                                    Enviar projeto
+                                    <span aria-hidden="true">→</span>
+                                </button>
+                                <button type="button" id="btn-relatorio-pdf"
+                                        class="btn-secundario btn-relatorio" disabled>
+                                    Baixar relatório em PDF
+                                </button>
+                            </div>
                         </div>
                         <p id="mensagem" class="mensagem" role="status"></p>
                     </div>

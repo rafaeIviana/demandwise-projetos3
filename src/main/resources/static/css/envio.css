@@ -772,6 +772,28 @@ a {
     font-size: 11px;
 }
 
+.acoes-formulario {
+    display: grid;
+    width: min(100%, 240px);
+    gap: 8px;
+}
+
+.acoes-formulario .btn-principal,
+.btn-relatorio {
+    width: 100%;
+}
+
+.btn-relatorio {
+    min-height: 43px;
+}
+
+.btn-relatorio:disabled {
+    border-color: #cbd2d9;
+    background: #f4f6f8;
+    color: #718096;
+    cursor: not-allowed;
+}
+
 .resumo ul {
     display: grid;
     gap: 11px;
@@ -1138,7 +1160,7 @@ a {
         flex-direction: column;
     }
 
-    .rodape-formulario .btn-principal {
+    .rodape-formulario .acoes-formulario {
         width: 100%;
     }
 

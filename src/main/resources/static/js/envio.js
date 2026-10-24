@@ -8,6 +8,7 @@ const erroApartamentos = document.getElementById("erro-apartamentos");
 
 const botaoAdicionar = document.getElementById("btn-adicionar");
 const botaoEnviar = document.getElementById("btn-enviar");
+const botaoRelatorio = document.getElementById("btn-relatorio-pdf");
 
 const listaPendencias = document.getElementById("lista-pendencias");
 const resumoOk = document.getElementById("resumo-ok");
@@ -16,6 +17,7 @@ const iconeChecklist = document.getElementById("icone-checklist");
 
 const mensagem = document.getElementById("mensagem");
 const validacoesNormativas = new WeakMap();
+let gerandoRelatorio = false;
 
 function valorFaltando(input) {
     const valor = input.value.trim();
@@ -318,6 +320,7 @@ function validar() {
     const totalPendencias = renderizarChecklist(requisitos);
 
     botaoEnviar.disabled = totalPendencias > 0;
+    botaoRelatorio.disabled = totalPendencias > 0 || gerandoRelatorio;
 
     return totalPendencias === 0;
 }
@@ -740,5 +743,60 @@ campoTomadas.addEventListener("input", () => {
     validar();
 });
 
+botaoRelatorio.addEventListener("click", async () => {
+    mensagem.className = "mensagem";
+    mensagem.textContent = "";
+
+    if (!validar()) {
+        mensagem.classList.add("mensagem-erro");
+        mensagem.textContent = "Preencha os campos obrigatórios antes de gerar o relatório.";
+        return;
+    }
+
+    const edificacao = montarEdificacao();
+    gerandoRelatorio = true;
+    botaoRelatorio.disabled = true;
+    mensagem.textContent = "Gerando relatório PDF...";
+
+    try {
+        const resposta = await fetch("/api/relatorio/pdf", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(edificacao)
+        });
+
+        if (!resposta.ok) {
+            const erro = await lerResposta(resposta);
+            throw new Error(obterMensagemErro(
+                erro,
+                "O servidor recusou a geração do relatório."
+            ));
+        }
+
+        const tipoConteudo = resposta.headers.get("Content-Type") || "";
+        if (!tipoConteudo.toLowerCase().includes("application/pdf")) {
+            throw new Error("O servidor não retornou um arquivo PDF válido.");
+        }
+
+        const arquivo = await resposta.blob();
+        const url = URL.createObjectURL(arquivo);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "relatorio-calculo-demanda.pdf";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+        mensagem.classList.add("mensagem-ok");
+        mensagem.textContent = "Relatório PDF gerado e download iniciado.";
+    } catch (erro) {
+        mensagem.classList.add("mensagem-erro");
+        mensagem.textContent = erro.message || "Não foi possível gerar o relatório PDF.";
+    } finally {
+        gerandoRelatorio = false;
+        validar();
+    }
+});
 botaoAdicionar.addEventListener("click", adicionarApartamento);
 adicionarApartamento();
