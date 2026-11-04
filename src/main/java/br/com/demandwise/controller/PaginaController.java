@@ -11,4 +11,9 @@ public class PaginaController {
     public String paginaEnvio() {
         return "envio";
     }
+
+    @GetMapping("/dashboard")
+    public String telaDeDashboard() {
+        return "dashboard";
+    }
 }

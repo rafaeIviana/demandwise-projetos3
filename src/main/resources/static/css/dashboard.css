@@ -1,0 +1,195 @@
+/* US-10 — dashboard de métricas de reprovação (usa as variáveis do envio.css) */
+
+.dash-aviso {
+    margin: 0 0 20px;
+    padding: 10px 14px;
+    border: 1px solid #efd69a;
+    border-radius: 10px;
+    background: #fff8e6;
+    color: #6b5216;
+}
+
+.dash-cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.dash-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.dash-card-rotulo {
+    color: var(--texto-secundario);
+    font-size: 13px;
+}
+
+.dash-card-valor {
+    font-size: 30px;
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+}
+
+.dash-valor-depois {
+    color: var(--azul);
+}
+
+.dash-valor-reducao {
+    color: var(--verde);
+}
+
+.dash-card-detalhe {
+    color: var(--texto-secundario);
+    font-size: 12px;
+}
+
+.dash-grafico-bloco,
+.dash-tabela-bloco {
+    margin-bottom: 20px;
+}
+
+.dash-legenda {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin: 16px 0 8px;
+    color: var(--texto-secundario);
+    font-size: 13px;
+}
+
+.dash-legenda > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.dash-amostra {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+}
+
+.dash-amostra-antes,
+.dash-barra-antes {
+    background: #b7c0cf;
+}
+
+.dash-amostra-depois,
+.dash-barra-depois {
+    background: var(--azul);
+}
+
+.dash-grafico {
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+    height: 290px;
+    padding-top: 12px;
+    overflow-x: auto;
+}
+
+.dash-coluna {
+    position: relative;
+    display: flex;
+    flex: 1 0 40px;
+    flex-direction: column;
+    align-items: center;
+}
+
+.dash-coluna.dash-marco::before {
+    content: "Adoção";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -5px;
+    padding-left: 4px;
+    border-left: 2px dashed var(--verde);
+    color: var(--verde);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.dash-trilho {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+    border-bottom: 1px solid var(--borda);
+}
+
+.dash-valor-barra {
+    margin-bottom: 4px;
+    color: var(--texto-secundario);
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+}
+
+.dash-barra {
+    width: 100%;
+    max-width: 40px;
+    min-height: 2px;
+    border-radius: 6px 6px 0 0;
+}
+
+.dash-mes {
+    padding-top: 6px;
+    color: var(--texto-secundario);
+    font-size: 11px;
+}
+
+.dash-tabela-rolagem {
+    margin-top: 16px;
+    overflow-x: auto;
+}
+
+.dash-tabela {
+    width: 100%;
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
+}
+
+.dash-tabela th,
+.dash-tabela td {
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--borda);
+    text-align: left;
+    white-space: nowrap;
+}
+
+.dash-tabela th {
+    color: var(--texto-secundario);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.dash-tabela .num {
+    text-align: right;
+}
+
+.dash-tag {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+}
+
+.dash-tag-antes {
+    background: #eef1f5;
+    color: #556074;
+}
+
+.dash-tag-depois {
+    background: var(--azul-claro);
+    color: var(--azul);
+}
+
+@media (max-width: 900px) {
+    .dash-cards {
+        grid-template-columns: 1fr;
+    }
+}
