@@ -688,28 +688,10 @@ formulario.addEventListener("submit", async evento => {
                 )
             );
         }
-        mensagem.textContent = "Calculando demanda...";
-
-        const respostaCalculo = await fetch("/api/demanda/calcular", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(edificacao)
-        });
-
-        const resultadoCalculo = await lerResposta(respostaCalculo);
-
-        if (!respostaCalculo.ok) {
-            throw new Error(
-                obterMensagemErro(
-                    resultadoCalculo,
-                    "Não foi possível concluir o cálculo da demanda."
-                )
-            );
-        }
+        const resultadoCalculo = resultadoChecklist.resultadoDemanda;
 
         if (
+            !resultadoCalculo ||
             typeof resultadoCalculo.demandaTotal !== "number" ||
             !Number.isFinite(resultadoCalculo.demandaTotal)
         ) {
