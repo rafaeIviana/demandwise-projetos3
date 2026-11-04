@@ -81,7 +81,49 @@ class EnvioValidacaoTest {
         mockMvc.perform(post(ENVIAR).contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.liberadoParaEnvio").value(true))
-                .andExpect(jsonPath("$.pendencias").isEmpty());
+                .andExpect(jsonPath("$.pendencias").isEmpty())
+                .andExpect(jsonPath("$.resultadoDemanda.demandaTotal").isNumber())
+                .andExpect(jsonPath("$.resultadoDemanda.memoriaCalculo").isArray());
+    }
+
+    @Test
+    void bloqueiaTipoDeInstalacaoIndisponivelAntesDoCalculo() throws Exception {
+        String json = """
+                {
+                  "apartamentos": [{"areaUtil": 60, "potenciaInstalada": 5}],
+                  "potenciaIluminacao": 2,
+                  "potenciaTomadas": 3,
+                  "tipoInstalacao": "COMERCIAL"
+                }
+                """;
+
+        mockMvc.perform(post(ENVIAR).contentType(MediaType.APPLICATION_JSON).content(json))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.liberadoParaEnvio").value(false))
+                .andExpect(jsonPath("$.pendencias[0]").value(containsString("Comercial")))
+                .andExpect(jsonPath("$.resultadoDemanda").doesNotExist());
+    }
+
+    @Test
+    void trataEdificacaoNulaComoPendenciaControlada() throws Exception {
+        mockMvc.perform(post(ENVIAR).contentType(MediaType.APPLICATION_JSON).content("null"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.pendencias[0]").value("Edificação não informada"));
+    }
+
+    @Test
+    void trataApartamentoNuloComoPendenciaControlada() throws Exception {
+        String json = """
+                {
+                  "apartamentos": [null],
+                  "potenciaIluminacao": 2,
+                  "potenciaTomadas": 3
+                }
+                """;
+
+        mockMvc.perform(post(ENVIAR).contentType(MediaType.APPLICATION_JSON).content(json))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.pendencias[0]").value("Apartamento 1 não informado"));
     }
 
     @Test

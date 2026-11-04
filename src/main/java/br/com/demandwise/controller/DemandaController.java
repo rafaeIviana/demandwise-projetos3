@@ -2,8 +2,8 @@
 package br.com.demandwise.controller;
 
 import br.com.demandwise.model.Edificacao;
-import br.com.demandwise.model.TipoInstalacao;
 import br.com.demandwise.service.DemandaService;
+import br.com.demandwise.service.DisponibilidadeTipoInstalacaoService;
 import br.com.demandwise.service.ResultadoDemanda;
 
 import org.springframework.http.HttpStatus;
@@ -17,20 +17,22 @@ import java.util.Map;
 public class DemandaController {
 
     private final DemandaService demandaService;
+    private final DisponibilidadeTipoInstalacaoService disponibilidadeTipoInstalacaoService;
 
-    public DemandaController(DemandaService demandaService) {
+    public DemandaController(
+            DemandaService demandaService,
+            DisponibilidadeTipoInstalacaoService disponibilidadeTipoInstalacaoService) {
         this.demandaService = demandaService;
+        this.disponibilidadeTipoInstalacaoService = disponibilidadeTipoInstalacaoService;
     }
 
     @PostMapping("/calcular")
     public ResponseEntity<?> calcular(@RequestBody Edificacao edificacao) {
-        TipoInstalacao tipo = edificacao.getTipoInstalacao();
-        if (!tipo.isDisponivel()) {
+        String indisponibilidade =
+                disponibilidadeTipoInstalacaoService.mensagemIndisponibilidade(edificacao);
+        if (indisponibilidade != null) {
             return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(Map.of(
-                    "mensagem", "O cálculo para instalação do tipo "
-                            + tipo.getDescricao()
-                            + " estará disponível em breve. "
-                            + "Nesta fase, apenas o tipo Residencial está implementado."
+                    "mensagem", indisponibilidade
             ));
         }
 

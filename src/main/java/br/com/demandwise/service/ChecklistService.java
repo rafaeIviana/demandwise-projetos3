@@ -15,6 +15,12 @@ public class ChecklistService {
         List<String> camposObrigatorios = new ArrayList<>();
         List<String> pendencias = new ArrayList<>();
 
+        if (edificacao == null) {
+            camposObrigatorios.add("Edificação");
+            pendencias.add("Edificação não informada");
+            return new ChecklistResponse(false, camposObrigatorios, pendencias);
+        }
+
         camposObrigatorios.add("Apartamentos da edificação");
         List<Apartamento> apartamentos = edificacao.getApartamentos();
 
@@ -24,6 +30,12 @@ public class ChecklistService {
             for (int i = 0; i < apartamentos.size(); i++) {
                 Apartamento apartamento = apartamentos.get(i);
                 int numero = i + 1;
+
+                if (apartamento == null) {
+                    camposObrigatorios.add("Apartamento " + numero);
+                    pendencias.add("Apartamento " + numero + " não informado");
+                    continue;
+                }
 
                 camposObrigatorios.add("Apartamento " + numero + " - área útil");
                 if (!valorPositivoFinito(apartamento.getAreaUtil())) {

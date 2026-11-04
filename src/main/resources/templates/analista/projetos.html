@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Projetos pré-validados — DemandWise</title>
+    <link rel="stylesheet" th:href="@{/css/envio.css}">
+    <link rel="stylesheet" th:href="@{/css/analista.css(v='20261104-1')}">
+</head>
+<body>
+<div class="app">
+    <aside class="sidebar">
+        <a class="marca" th:href="@{/envio}">
+            <span class="marca-icone">D</span>
+            <span>Demand<span class="marca-destaque">Wise</span></span>
+        </a>
+        <p class="nav-titulo">WORKSPACE</p>
+        <nav class="navegacao" aria-label="Navegação principal">
+            <a class="nav-item" th:href="@{/envio}"><span class="nav-icone">▦</span>Novo projeto</a>
+            <a class="nav-item ativo" th:href="@{/analista/projetos}"><span class="nav-icone">▤</span>Projetos pré-validados</a>
+        </nav>
+        <div class="sidebar-ajuda">
+            <span class="ajuda-icone">i</span>
+            <strong>Fila de análise</strong>
+            <p>Consulte os dados enviados e a memória de cálculo já registrada.</p>
+        </div>
+        <div class="perfil">
+            <span class="avatar">DW</span>
+            <span class="perfil-texto"><strong>DemandWise</strong><small>Painel da analista</small></span>
+        </div>
+    </aside>
+
+    <main class="conteudo">
+        <header class="topbar">
+            <div class="breadcrumb"><span>Projetos</span><span class="breadcrumb-separador">/</span><strong>Pré-validados</strong></div>
+            <span class="status-rascunho"><span class="status-ponto"></span>Fila de análise</span>
+        </header>
+        <div class="pagina">
+            <section class="introducao">
+                <div>
+                    <p class="sobretitulo">ÁREA DE ANÁLISE <span>•</span> PROJETOS</p>
+                    <h1>Projetos pré-validados</h1>
+                    <p class="subtitulo">Consulte os projetos que concluíram as validações automáticas e o cálculo de demanda.</p>
+                </div>
+                <div class="etapa-badge"><span class="etapa-numero">US</span><span>Fila de projetos</span></div>
+            </section>
+
+            <section class="bloco painel-projetos" aria-labelledby="titulo-projetos">
+                <div class="painel-cabecalho">
+                    <div>
+                        <p class="resumo-sobretitulo">CONSULTA</p>
+                        <h2 id="titulo-projetos">Projetos recebidos</h2>
+                    </div>
+                    <span class="quantidade-projetos" th:text="${#lists.size(projetos) == 1 ? '1 projeto' : #lists.size(projetos) + ' projetos'}">0 projetos</span>
+                </div>
+
+                <div class="estado-vazio" th:if="${#lists.isEmpty(projetos)}">
+                    <span class="estado-vazio-icone" aria-hidden="true">▤</span>
+                    <h3>Nenhum projeto disponível</h3>
+                    <p>Os projetos aparecerão aqui depois de concluírem o checklist, as validações e o cálculo.</p>
+                    <a class="btn-secundario" th:href="@{/envio}">Ir para novo projeto</a>
+                </div>
+
+                <div class="lista-projetos" th:unless="${#lists.isEmpty(projetos)}">
+                    <article class="projeto-card" th:each="projeto : ${projetos}">
+                        <div class="projeto-card-principal">
+                            <div class="projeto-identificacao">
+                                <span class="projeto-id" th:text="|Projeto #${projeto.id}|">Projeto #1</span>
+                                <span class="status-pre-validado"><span aria-hidden="true">✓</span><span th:text="${projeto.status}">Pré-validado</span></span>
+                            </div>
+                            <h3 th:text="${projeto.edificacao.tipoInstalacao.descricao}">Edificação residencial</h3>
+                            <p class="projeto-resumo">
+                                <span th:text="${#lists.size(projeto.edificacao.apartamentos) == 1 ? '1 apartamento' : #lists.size(projeto.edificacao.apartamentos) + ' apartamentos'}">1 apartamento</span>
+                                <span class="separador-resumo">·</span>
+                                <span th:text="|Iluminação ${projeto.edificacao.potenciaIluminacao} kW|">Iluminação 0 kW</span>
+                                <span class="separador-resumo">·</span>
+                                <span th:text="|Tomadas ${projeto.edificacao.potenciaTomadas} kW|">Tomadas 0 kW</span>
+                            </p>
+                        </div>
+                        <div class="projeto-card-acao">
+                            <a class="btn-principal" th:href="@{/analista/projetos/{id}(id=${projeto.id})}">Consultar detalhes <span aria-hidden="true">→</span></a>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <footer class="rodape-pagina">
+                <span>DemandWise <span class="rodape-ponto">·</span> Painel da analista</span>
+                <a th:href="@{/envio}">Voltar ao envio de projeto</a>
+            </footer>
+        </div>
+    </main>
+</div>
+</body>
+</html>
