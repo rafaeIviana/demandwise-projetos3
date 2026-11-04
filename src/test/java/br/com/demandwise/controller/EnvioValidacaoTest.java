@@ -13,8 +13,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-// US-06: o envio tem que ser bloqueado no servidor, mesmo que alguém ignore a tela
 @SpringBootTest
 @AutoConfigureMockMvc
 class EnvioValidacaoTest {

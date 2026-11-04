@@ -3,21 +3,38 @@ package br.com.demandwise.controller;
 
 import br.com.demandwise.model.Apartamento;
 import br.com.demandwise.model.Edificacao;
+import br.com.demandwise.projeto.ProjetoPreValidado;
+import br.com.demandwise.service.ChecklistService;
 import br.com.demandwise.service.DemandaService;
 import br.com.demandwise.service.ProjetoPreValidadoService;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ChecklistControllerTest {
 
     private ChecklistController criarController() {
         return new ChecklistController(
+                new ChecklistService(),
                 new DemandaService(),
                 new ProjetoPreValidadoService()
         );
+    }
+
+    private Edificacao criarEdificacaoValida() {
+        Edificacao edificacao = new Edificacao();
+
+        Apartamento apartamento = new Apartamento();
+        apartamento.setAreaUtil(40);
+        apartamento.setPotenciaInstalada(10);
+
+        edificacao.setApartamentos(java.util.List.of(apartamento));
+        edificacao.setPotenciaIluminacao(10);
+        edificacao.setPotenciaTomadas(10);
+
+        return edificacao;
     }
 
     @Test
@@ -28,6 +45,8 @@ class ChecklistControllerTest {
         var resultado = controller.verificar(edificacao);
 
         assertFalse(resultado.liberadoParaEnvio());
+        assertTrue(resultado.pendencias().contains(
+                "Nenhum apartamento foi informado"));
     }
 
     @Test
@@ -53,13 +72,8 @@ class ChecklistControllerTest {
     @Test
     void deveIdentificarPendenciaDeIluminacaoETomadas() {
         ChecklistController controller = criarController();
-        Edificacao edificacao = new Edificacao();
+        Edificacao edificacao = criarEdificacaoValida();
 
-        Apartamento apartamento = new Apartamento();
-        apartamento.setAreaUtil(40);
-        apartamento.setPotenciaInstalada(10);
-
-        edificacao.setApartamentos(java.util.List.of(apartamento));
         edificacao.setPotenciaIluminacao(0);
         edificacao.setPotenciaTomadas(0);
 
@@ -75,15 +89,7 @@ class ChecklistControllerTest {
     @Test
     void deveLiberarEnvioQuandoChecklistEstiverCompleto() {
         ChecklistController controller = criarController();
-        Edificacao edificacao = new Edificacao();
-
-        Apartamento apartamento = new Apartamento();
-        apartamento.setAreaUtil(40);
-        apartamento.setPotenciaInstalada(10);
-
-        edificacao.setApartamentos(java.util.List.of(apartamento));
-        edificacao.setPotenciaIluminacao(10);
-        edificacao.setPotenciaTomadas(10);
+        Edificacao edificacao = criarEdificacaoValida();
 
         var resultado = controller.verificar(edificacao);
 
@@ -104,18 +110,34 @@ class ChecklistControllerTest {
     @Test
     void deveRetornar200QuandoChecklistEstiverCompleto() {
         ChecklistController controller = criarController();
-        Edificacao edificacao = new Edificacao();
-
-        Apartamento apartamento = new Apartamento();
-        apartamento.setAreaUtil(40);
-        apartamento.setPotenciaInstalada(10);
-
-        edificacao.setApartamentos(java.util.List.of(apartamento));
-        edificacao.setPotenciaIluminacao(10);
-        edificacao.setPotenciaTomadas(10);
+        Edificacao edificacao = criarEdificacaoValida();
 
         var resposta = controller.enviar(edificacao);
 
         assertEquals(200, resposta.getStatusCode().value());
+    }
+
+    @Test
+    void deveSalvarProjetoPreValidadoQuandoEnvioForCompleto() {
+        ProjetoPreValidadoService projetoService =
+                new ProjetoPreValidadoService();
+
+        ChecklistController controller = new ChecklistController(
+                new ChecklistService(),
+                new DemandaService(),
+                projetoService
+        );
+
+        Edificacao edificacao = criarEdificacaoValida();
+
+        controller.enviar(edificacao);
+
+        assertEquals(1, projetoService.listarTodos().size());
+
+        ProjetoPreValidado projeto = projetoService.listarTodos().get(0);
+
+        assertEquals("Pré-validado", projeto.status());
+        assertEquals(edificacao, projeto.edificacao());
+        assertTrue(projeto.resultadoDemanda().demandaTotal() > 0);
     }
 }

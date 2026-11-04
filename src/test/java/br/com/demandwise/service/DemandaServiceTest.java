@@ -1,19 +1,20 @@
+
 package br.com.demandwise.service;
 
 import br.com.demandwise.model.Apartamento;
 import br.com.demandwise.model.Edificacao;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DemandaServiceTest {
 
     @Test
     void deveRegistrarCriteriosNormativosNaMemoriaDeCalculo() {
-
         DemandaService service = new DemandaService();
 
         Edificacao edificacao = new Edificacao();
@@ -40,129 +41,144 @@ class DemandaServiceTest {
 
     @Test
     void deveRegistrarValorCorretoDoQuadro35() {
-    
         DemandaService service = new DemandaService();
-    
+
         Edificacao edificacao = new Edificacao();
-    
+
         Apartamento apartamento = new Apartamento();
         apartamento.setAreaUtil(40);
         apartamento.setPotenciaInstalada(10);
-    
+
         edificacao.setApartamentos(List.of(apartamento));
         edificacao.setPotenciaIluminacao(10);
         edificacao.setPotenciaTomadas(10);
-    
+
         ResultadoDemanda resultado = service.calcularDemanda(edificacao);
-    
+
         CriterioAplicado criterioQuadro35 = resultado.memoriaCalculo().stream()
                 .filter(c -> c.criterio().equals("QUADRO_35"))
                 .findFirst()
                 .orElseThrow();
-    
+
         assertEquals(1.00, criterioQuadro35.valorAplicado(), 0.01);
     }
 
     @Test
-void deveRegistrarValorCorretoDoFatorDeCoincidencia() {
+    void deveRegistrarValorCorretoDoFatorDeCoincidencia() {
+        DemandaService service = new DemandaService();
 
-    DemandaService service = new DemandaService();
+        Edificacao edificacao = new Edificacao();
 
-    Edificacao edificacao = new Edificacao();
+        Apartamento apartamento = new Apartamento();
+        apartamento.setAreaUtil(40);
+        apartamento.setPotenciaInstalada(10);
 
-    Apartamento apartamento = new Apartamento();
-    apartamento.setAreaUtil(40);
-    apartamento.setPotenciaInstalada(10);
+        edificacao.setApartamentos(List.of(apartamento));
+        edificacao.setPotenciaIluminacao(10);
+        edificacao.setPotenciaTomadas(10);
 
-    edificacao.setApartamentos(List.of(apartamento));
-    edificacao.setPotenciaIluminacao(10);
-    edificacao.setPotenciaTomadas(10);
+        ResultadoDemanda resultado = service.calcularDemanda(edificacao);
 
-    ResultadoDemanda resultado = service.calcularDemanda(edificacao);
+        CriterioAplicado criterio = resultado.memoriaCalculo().stream()
+                .filter(c -> c.criterio().equals("FATOR_COINCIDENCIA"))
+                .findFirst()
+                .orElseThrow();
 
-    CriterioAplicado criterio = resultado.memoriaCalculo().stream()
-            .filter(c -> c.criterio().equals("FATOR_COINCIDENCIA"))
-            .findFirst()
-            .orElseThrow();
+        assertEquals(1.00, criterio.valorAplicado(), 0.01);
+    }
 
-    assertEquals(1.00, criterio.valorAplicado(), 0.01);
-}
+    @Test
+    void deveRegistrarValorCorretoDoFatorDeSeguranca() {
+        DemandaService service = new DemandaService();
 
-@Test
-void deveRegistrarValorCorretoDoFatorDeSeguranca() {
+        Edificacao edificacao = new Edificacao();
 
-    DemandaService service = new DemandaService();
+        Apartamento apartamento = new Apartamento();
+        apartamento.setAreaUtil(40);
+        apartamento.setPotenciaInstalada(10);
 
-    Edificacao edificacao = new Edificacao();
+        edificacao.setApartamentos(List.of(apartamento));
+        edificacao.setPotenciaIluminacao(10);
+        edificacao.setPotenciaTomadas(10);
 
-    Apartamento apartamento = new Apartamento();
-    apartamento.setAreaUtil(40);
-    apartamento.setPotenciaInstalada(10);
+        ResultadoDemanda resultado = service.calcularDemanda(edificacao);
 
-    edificacao.setApartamentos(List.of(apartamento));
-    edificacao.setPotenciaIluminacao(10);
-    edificacao.setPotenciaTomadas(10);
+        CriterioAplicado criterio = resultado.memoriaCalculo().stream()
+                .filter(c -> c.criterio().equals("FATOR_SEGURANCA"))
+                .findFirst()
+                .orElseThrow();
 
-    ResultadoDemanda resultado = service.calcularDemanda(edificacao);
+        assertEquals(1.50, criterio.valorAplicado(), 0.01);
+    }
 
-    CriterioAplicado criterio = resultado.memoriaCalculo().stream()
-            .filter(c -> c.criterio().equals("FATOR_SEGURANCA"))
-            .findFirst()
-            .orElseThrow();
+    @Test
+    void deveRegistrarCriterioDeIluminacaoETomadas() {
+        DemandaService service = new DemandaService();
 
-    assertEquals(1.50, criterio.valorAplicado(), 0.01);
-}
+        Edificacao edificacao = new Edificacao();
 
-@Test
-void deveRegistrarCriterioDeIluminacaoETomadas() {
+        Apartamento apartamento = new Apartamento();
+        apartamento.setAreaUtil(40);
+        apartamento.setPotenciaInstalada(10);
 
-    DemandaService service = new DemandaService();
+        edificacao.setApartamentos(List.of(apartamento));
+        edificacao.setPotenciaIluminacao(10);
+        edificacao.setPotenciaTomadas(10);
 
-    Edificacao edificacao = new Edificacao();
+        ResultadoDemanda resultado = service.calcularDemanda(edificacao);
 
-    Apartamento apartamento = new Apartamento();
-    apartamento.setAreaUtil(40);
-    apartamento.setPotenciaInstalada(10);
+        CriterioAplicado criterio = resultado.memoriaCalculo().stream()
+                .filter(c -> c.criterio().equals("DEMANDA_ILUMINACAO_TOMADAS_PADRAO"))
+                .findFirst()
+                .orElseThrow();
 
-    edificacao.setApartamentos(List.of(apartamento));
-    edificacao.setPotenciaIluminacao(10);
-    edificacao.setPotenciaTomadas(10);
+        assertEquals(18.75, criterio.valorAplicado(), 0.01);
+    }
 
-    ResultadoDemanda resultado = service.calcularDemanda(edificacao);
+    @Test
+    void deveRegistrarDemandaDosMotores() {
+        DemandaService service = new DemandaService();
 
-    CriterioAplicado criterio = resultado.memoriaCalculo().stream()
-            .filter(c -> c.criterio().equals("DEMANDA_ILUMINACAO_TOMADAS_PADRAO"))
-            .findFirst()
-            .orElseThrow();
+        Edificacao edificacao = new Edificacao();
 
-    assertEquals(18.75, criterio.valorAplicado(), 0.01);
-}
+        Apartamento apartamento = new Apartamento();
+        apartamento.setAreaUtil(40);
+        apartamento.setPotenciaInstalada(10);
 
-@Test
-void deveRegistrarDemandaDosMotores() {
+        edificacao.setApartamentos(List.of(apartamento));
+        edificacao.setPotenciaIluminacao(10);
+        edificacao.setPotenciaTomadas(10);
+        edificacao.setPotenciasMotores(List.of(10.0, 4.0));
 
-    DemandaService service = new DemandaService();
+        ResultadoDemanda resultado = service.calcularDemanda(edificacao);
 
-    Edificacao edificacao = new Edificacao();
+        CriterioAplicado criterio = resultado.memoriaCalculo().stream()
+                .filter(c -> c.criterio().equals("DEMANDA_MOTORES"))
+                .findFirst()
+                .orElseThrow();
 
-    Apartamento apartamento = new Apartamento();
-    apartamento.setAreaUtil(40);
-    apartamento.setPotenciaInstalada(10);
+        assertEquals(12.00, criterio.valorAplicado(), 0.01);
+    }
 
-    edificacao.setApartamentos(List.of(apartamento));
-    edificacao.setPotenciaIluminacao(10);
-    edificacao.setPotenciaTomadas(10);
-    edificacao.setPotenciasMotores(List.of(10.0, 4.0));
+    @Test
+    void deveRejeitarCalculoQuandoAreaUltrapassarLimiteDoQuadro35() {
+        DemandaService service = new DemandaService();
 
-    ResultadoDemanda resultado = service.calcularDemanda(edificacao);
+        Edificacao edificacao = new Edificacao();
 
-    CriterioAplicado criterio = resultado.memoriaCalculo().stream()
-            .filter(c -> c.criterio().equals("DEMANDA_MOTORES"))
-            .findFirst()
-            .orElseThrow();
+        Apartamento apartamento = new Apartamento();
+        apartamento.setAreaUtil(1001);
+        apartamento.setPotenciaInstalada(10);
 
-    assertEquals(12.00, criterio.valorAplicado(), 0.01);
-}
+        edificacao.setApartamentos(List.of(apartamento));
+        edificacao.setPotenciaIluminacao(10);
+        edificacao.setPotenciaTomadas(10);
 
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> service.calcularDemanda(edificacao)
+        );
 
+        assertTrue(exception.getMessage().contains("1000 m²"));
+    }
 }
