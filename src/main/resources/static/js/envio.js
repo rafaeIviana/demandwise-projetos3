@@ -782,3 +782,134 @@ botaoRelatorio.addEventListener("click", async () => {
 });
 botaoAdicionar.addEventListener("click", adicionarApartamento);
 adicionarApartamento();
+
+// ===== US-05: templates de prédio-tipo =====
+const seletorTemplate = document.getElementById("seletor-template");
+const botaoSalvarTemplate = document.getElementById("btn-salvar-template");
+
+function mostrarMensagem(texto, tipo) {
+    mensagem.textContent = texto;
+    mensagem.className = tipo ? `mensagem mensagem-${tipo}` : "mensagem";
+}
+
+async function carregarListaTemplates(selecionarId) {
+    try {
+        const resposta = await fetch("/api/templates");
+        if (!resposta.ok) {
+            throw new Error("Falha ao listar templates.");
+        }
+        const lista = await resposta.json();
+
+        seletorTemplate.replaceChildren(new Option("Começar do zero", ""));
+        lista.forEach(t => {
+            seletorTemplate.appendChild(new Option(t.nome, String(t.id)));
+        });
+
+        if (selecionarId != null) {
+            seletorTemplate.value = String(selecionarId);
+        }
+    } catch {
+        // Sem lista, o formulário continua funcionando normalmente.
+    }
+}
+
+function preencherFormulario(edificacao) {
+    limparResultado();
+
+    listaApartamentos.querySelectorAll(".apartamento").forEach(apto => {
+        validacoesNormativas.get(apto)?.abort();
+        validacoesNormativas.delete(apto);
+        apto.remove();
+    });
+
+    // Só preenche os campos; eles continuam editáveis.
+    campoIluminacao.value = edificacao.potenciaIluminacao || "";
+    campoTomadas.value = edificacao.potenciaTomadas || "";
+
+    const apartamentos = edificacao.apartamentos || [];
+
+    if (apartamentos.length === 0) {
+        adicionarApartamento();
+    } else {
+        apartamentos.forEach(dados => {
+            adicionarApartamento();
+            const apto = listaApartamentos.lastElementChild;
+            apto.querySelector(".area-util").value = dados.areaUtil || "";
+            apto.querySelector(".potencia-instalada").value =
+                dados.potenciaInstalada || "";
+            atualizarAlertaNormativo(apto);
+        });
+    }
+
+    validar();
+}
+
+seletorTemplate.addEventListener("change", async () => {
+    const id = seletorTemplate.value;
+    if (id === "") {
+        return;
+    }
+
+    try {
+        const resposta = await fetch(`/api/templates/${id}`);
+        const resultado = await lerResposta(resposta);
+
+        if (!resposta.ok) {
+            throw new Error(
+                obterMensagemErro(resultado, "Não foi possível carregar o template.")
+            );
+        }
+
+        preencherFormulario(resultado.edificacao);
+        mostrarMensagem(
+            `Template "${resultado.nome}" carregado. Edite os campos se precisar.`,
+            "ok"
+        );
+    } catch (erro) {
+        mostrarMensagem(erro.message || "Erro ao carregar o template.", "erro");
+    }
+});
+
+botaoSalvarTemplate.addEventListener("click", async () => {
+    if (!validar()) {
+        mostrarMensagem(
+            "Preencha todos os campos obrigatórios antes de salvar o template.",
+            "erro"
+        );
+        return;
+    }
+
+    const nome = window.prompt("Nome do template:");
+    if (nome === null || nome.trim() === "") {
+        return;
+    }
+
+    botaoSalvarTemplate.disabled = true;
+
+    try {
+        const resposta = await fetch("/api/templates", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                nome: nome.trim(),
+                edificacao: montarEdificacao()
+            })
+        });
+        const resultado = await lerResposta(resposta);
+
+        if (!resposta.ok) {
+            throw new Error(
+                obterMensagemErro(resultado, "Não foi possível salvar o template.")
+            );
+        }
+
+        await carregarListaTemplates(resultado.id);
+        mostrarMensagem(`Template "${resultado.nome}" salvo.`, "ok");
+    } catch (erro) {
+        mostrarMensagem(erro.message || "Erro ao salvar o template.", "erro");
+    } finally {
+        botaoSalvarTemplate.disabled = false;
+    }
+});
+
+carregarListaTemplates();

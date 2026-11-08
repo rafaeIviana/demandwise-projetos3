@@ -98,6 +98,21 @@
                 <div class="layout-formulario">
                     <div class="coluna-formulario">
                         <section class="bloco">
+    <div class="bloco-cabecalho">
+        <span class="bloco-icone">★</span>
+        <div>
+            <h2>Começar de um template</h2>
+            <p>Carregue os dados de um prédio-tipo salvo. Você pode editar tudo depois.</p>
+        </div>
+    </div>
+    <div class="campo">
+        <label for="seletor-template">Template salvo</label>
+        <select id="seletor-template">
+            <option value="">Começar do zero</option>
+        </select>
+    </div>
+</section>
+                        <section class="bloco">
                             <div class="bloco-cabecalho">
                                 <span class="bloco-icone">01</span>
                                 <div>
@@ -164,6 +179,9 @@
                         <div class="rodape-formulario">
                             <span><span class="asterisco">*</span> Preencha todos os campos obrigatórios.</span>
                             <div class="acoes-formulario">
+                                <button type="button" id="btn-salvar-template" class="btn-secundario">
+    Salvar como template
+</button>
                                 <button type="submit" id="btn-enviar" class="btn-principal" disabled>
                                     Enviar projeto
                                     <span aria-hidden="true">→</span>
