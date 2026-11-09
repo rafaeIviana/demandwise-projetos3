@@ -5,8 +5,16 @@ const campoTomadas = document.getElementById("tomadas");
 
 const listaApartamentos = document.getElementById("lista-apartamentos");
 const erroApartamentos = document.getElementById("erro-apartamentos");
+const modoResidencial = document.getElementById("modo-residencial");
+const entradaGruposResidenciais = document.getElementById("entrada-grupos-residenciais");
+const entradaApartamentosIndividuais = document.getElementById("entrada-apartamentos-individuais");
+const listaGruposResidenciais = document.getElementById("lista-grupos-residenciais");
+const erroGruposResidenciais = document.getElementById("erro-grupos-residenciais");
+const camposServicoLegado = document.getElementById("campos-servico-legado");
+const avisoPdfGrupos = document.getElementById("aviso-pdf-grupos");
 
 const botaoAdicionar = document.getElementById("btn-adicionar");
+const botaoAdicionarGrupo = document.getElementById("btn-adicionar-grupo");
 const botaoEnviar = document.getElementById("btn-enviar");
 const botaoRelatorio = document.getElementById("btn-relatorio-pdf");
 
@@ -18,6 +26,52 @@ const iconeChecklist = document.getElementById("icone-checklist");
 const mensagem = document.getElementById("mensagem");
 const validacoesNormativas = new WeakMap();
 let gerandoRelatorio = false;
+
+const FAIXAS_RESIDENCIAIS = [
+    { min: 1, max: 40, rotulo: "Até 40 m²" },
+    { min: 41, max: 45, rotulo: "41–45 m²" },
+    { min: 46, max: 50, rotulo: "46–50 m²" },
+    { min: 51, max: 55, rotulo: "51–55 m²" },
+    { min: 56, max: 60, rotulo: "56–60 m²" },
+    { min: 61, max: 65, rotulo: "61–65 m²" },
+    { min: 66, max: 70, rotulo: "66–70 m²" },
+    { min: 71, max: 75, rotulo: "71–75 m²" },
+    { min: 76, max: 80, rotulo: "76–80 m²" },
+    { min: 81, max: 85, rotulo: "81–85 m²" },
+    { min: 86, max: 90, rotulo: "86–90 m²" },
+    { min: 91, max: 95, rotulo: "91–95 m²" },
+    { min: 96, max: 100, rotulo: "96–100 m²" },
+    { min: 101, max: 110, rotulo: "101–110 m²" },
+    { min: 111, max: 120, rotulo: "111–120 m²" },
+    { min: 121, max: 130, rotulo: "121–130 m²" },
+    { min: 131, max: 140, rotulo: "131–140 m²" },
+    { min: 141, max: 150, rotulo: "141–150 m²" },
+    { min: 151, max: 160, rotulo: "151–160 m²" },
+    { min: 161, max: 170, rotulo: "161–170 m²" },
+    { min: 171, max: 180, rotulo: "171–180 m²" },
+    { min: 181, max: 190, rotulo: "181–190 m²" },
+    { min: 191, max: 200, rotulo: "191–200 m²" },
+    { min: 201, max: 220, rotulo: "201–220 m²" },
+    { min: 221, max: 240, rotulo: "221–240 m²" },
+    { min: 241, max: 260, rotulo: "241–260 m²" },
+    { min: 261, max: 280, rotulo: "261–280 m²" },
+    { min: 281, max: 300, rotulo: "281–300 m²" },
+    { min: 301, max: 350, rotulo: "301–350 m²" },
+    { min: 351, max: 400, rotulo: "351–400 m²" },
+    { min: 401, max: 450, rotulo: "401–450 m²" },
+    { min: 451, max: 500, rotulo: "451–500 m²" },
+    { min: 501, max: 550, rotulo: "501–550 m²" },
+    { min: 551, max: 600, rotulo: "551–600 m²" },
+    { min: 601, max: 650, rotulo: "601–650 m²" },
+    { min: 651, max: 700, rotulo: "651–700 m²" },
+    { min: 701, max: 800, rotulo: "701–800 m²" },
+    { min: 801, max: 900, rotulo: "801–900 m²" },
+    { min: 901, max: 1000, rotulo: "901–1.000 m²" }
+];
+
+function usaGruposResidenciais() {
+    return modoResidencial.value === "grupos";
+}
 
 function valorFaltando(input) {
     const valor = input.value.trim();
@@ -125,6 +179,85 @@ function adicionarApartamento() {
     apartamento.append(cabecalho, campoArea, campoPotencia);
     listaApartamentos.appendChild(apartamento);
 
+    validar();
+}
+
+function adicionarGrupoResidencial() {
+    limparResultado();
+
+    const grupo = document.createElement("div");
+    grupo.className = "apartamento grupo-residencial";
+
+    const cabecalho = document.createElement("div");
+    cabecalho.className = "apartamento-cabecalho";
+
+    const titulo = document.createElement("h3");
+    titulo.className = "apartamento-titulo grupo-residencial-titulo";
+
+    const remover = document.createElement("button");
+    remover.type = "button";
+    remover.className = "btn-remover";
+    remover.textContent = "Remover";
+    remover.addEventListener("click", () => {
+        grupo.remove();
+        limparResultado();
+        validar();
+    });
+    cabecalho.append(titulo, remover);
+
+    const campoFaixa = document.createElement("div");
+    campoFaixa.className = "campo";
+    const labelFaixa = document.createElement("label");
+    labelFaixa.textContent = "Faixa de área útil";
+    const selectFaixa = document.createElement("select");
+    selectFaixa.className = "faixa-area-residencial";
+    selectFaixa.setAttribute("aria-invalid", "false");
+    selectFaixa.add(new Option("Selecione a faixa", ""));
+    FAIXAS_RESIDENCIAIS.forEach(faixa => {
+        const option = new Option(faixa.rotulo, `${faixa.min}|${faixa.max}`);
+        option.dataset.rotulo = faixa.rotulo;
+        selectFaixa.add(option);
+    });
+    const erroFaixa = document.createElement("span");
+    erroFaixa.className = "erro";
+    labelFaixa.appendChild(selectFaixa);
+    campoFaixa.append(labelFaixa, erroFaixa);
+
+    const campoQuantidade = document.createElement("div");
+    campoQuantidade.className = "campo";
+    const labelQuantidade = document.createElement("label");
+    labelQuantidade.textContent = "Quantidade de unidades";
+    const inputQuantidade = document.createElement("input");
+    inputQuantidade.type = "number";
+    inputQuantidade.min = "1";
+    inputQuantidade.step = "1";
+    inputQuantidade.inputMode = "numeric";
+    inputQuantidade.className = "quantidade-residencial";
+    inputQuantidade.setAttribute("aria-invalid", "false");
+    const erroQuantidade = document.createElement("span");
+    erroQuantidade.className = "erro";
+    labelQuantidade.appendChild(inputQuantidade);
+    campoQuantidade.append(labelQuantidade, erroQuantidade);
+
+    const aoAlterar = () => {
+        limparResultado();
+        validar();
+    };
+    selectFaixa.addEventListener("change", aoAlterar);
+    inputQuantidade.addEventListener("input", aoAlterar);
+
+    grupo.append(cabecalho, campoFaixa, campoQuantidade);
+    listaGruposResidenciais.appendChild(grupo);
+    validar();
+}
+
+function atualizarModoResidencial() {
+    const porGrupos = usaGruposResidenciais();
+    entradaGruposResidenciais.hidden = !porGrupos;
+    entradaApartamentosIndividuais.hidden = porGrupos;
+    camposServicoLegado.hidden = porGrupos;
+    avisoPdfGrupos.hidden = !porGrupos;
+    limparResultado();
     validar();
 }
 
@@ -241,91 +374,95 @@ async function atualizarAlertaNormativo(apartamento) {
 
 function validar() {
     const requisitos = [];
-
-    const iluminacaoFaltando = valorFaltando(campoIluminacao);
-    const tomadasFaltando = valorFaltando(campoTomadas);
-
-    marcarCampo(
-        campoIluminacao,
-        iluminacaoFaltando,
-        "Campo obrigatório"
-    );
-
-    marcarCampo(
-        campoTomadas,
-        tomadasFaltando,
-        "Campo obrigatório"
-    );
-
-    requisitos.push({
-        texto: "Potência de iluminação",
-        concluido: !iluminacaoFaltando
-    });
-    requisitos.push({
-        texto: "Potência de tomadas",
-        concluido: !tomadasFaltando
-    });
-
-    const apartamentos = [
-        ...listaApartamentos.querySelectorAll(".apartamento")
-    ];
-
-    erroApartamentos.textContent = apartamentos.length === 0
-        ? "Adicione pelo menos um apartamento."
-        : "";
-
-    apartamentos.forEach((apartamento, indice) => {
-        const titulo = apartamento.querySelector(".apartamento-titulo");
-        titulo.textContent = `Apartamento ${indice + 1}`;
-
-        const campoArea = apartamento.querySelector(".area-util");
-        const campoPotencia = apartamento.querySelector(".potencia-instalada");
-
-        const areaFaltando = valorFaltando(campoArea);
-        const potenciaFaltando = valorFaltando(campoPotencia);
-
-        const areaForaDoIntervalo =
-            !areaFaltando && Number(campoArea.value) > 1000;
-
-        const avisoArea = campoArea
-            .closest(".campo")
-            .querySelector(".aviso-tecnico");
-        const textoAvisoArea = avisoArea.querySelector(".aviso-texto");
-
-        avisoArea.hidden = !areaForaDoIntervalo;
-        textoAvisoArea.textContent = areaForaDoIntervalo
-            ? "Área fora do intervalo atendido pelo Quadro 35 (até 1.000 m²). Confira o método de cálculo aplicável."
+    if (usaGruposResidenciais()) {
+        const grupos = [...listaGruposResidenciais.querySelectorAll(".grupo-residencial")];
+        erroGruposResidenciais.textContent = grupos.length === 0
+            ? "Adicione pelo menos um grupo residencial."
             : "";
 
-        marcarCampo(campoArea, areaFaltando, "Campo obrigatório");
-        marcarCampo(campoPotencia, potenciaFaltando, "Campo obrigatório");
+        grupos.forEach((grupo, indice) => {
+            grupo.querySelector(".grupo-residencial-titulo").textContent = `Grupo residencial ${indice + 1}`;
+            const faixa = grupo.querySelector(".faixa-area-residencial");
+            const quantidade = grupo.querySelector(".quantidade-residencial");
+            const faixaFaltando = faixa.value === "";
+            const quantidadeValor = Number(quantidade.value);
+            const quantidadeInvalida = quantidade.value.trim() === "" ||
+                !Number.isInteger(quantidadeValor) || quantidadeValor <= 0;
 
-        requisitos.push({
-            texto: `Apartamento ${indice + 1} - área útil`,
-            concluido: !areaFaltando
+            marcarCampo(faixa, faixaFaltando, "Selecione uma faixa do Quadro 35");
+            marcarCampo(quantidade, quantidadeInvalida, "Informe uma quantidade inteira maior que zero");
+            requisitos.push({ texto: `Grupo ${indice + 1} - faixa de área`, concluido: !faixaFaltando });
+            requisitos.push({ texto: `Grupo ${indice + 1} - quantidade`, concluido: !quantidadeInvalida });
         });
-        requisitos.push({
-            texto: `Apartamento ${indice + 1} - potência instalada`,
-            concluido: !potenciaFaltando
-        });
-    });
 
-    if (apartamentos.length === 0) {
-        requisitos.push({
-            texto: "Adicionar pelo menos um apartamento",
-            concluido: false
+        if (grupos.length === 0) {
+            requisitos.push({ texto: "Adicionar pelo menos um grupo residencial", concluido: false });
+        }
+    } else {
+        const iluminacaoFaltando = valorFaltando(campoIluminacao);
+        const tomadasFaltando = valorFaltando(campoTomadas);
+        marcarCampo(campoIluminacao, iluminacaoFaltando, "Campo obrigatório");
+        marcarCampo(campoTomadas, tomadasFaltando, "Campo obrigatório");
+        requisitos.push({ texto: "Potência de iluminação", concluido: !iluminacaoFaltando });
+        requisitos.push({ texto: "Potência de tomadas", concluido: !tomadasFaltando });
+
+        const apartamentos = [...listaApartamentos.querySelectorAll(".apartamento")];
+        erroApartamentos.textContent = apartamentos.length === 0
+            ? "Adicione pelo menos um apartamento."
+            : "";
+
+        apartamentos.forEach((apartamento, indice) => {
+            apartamento.querySelector(".apartamento-titulo").textContent = `Apartamento ${indice + 1}`;
+            const campoArea = apartamento.querySelector(".area-util");
+            const campoPotencia = apartamento.querySelector(".potencia-instalada");
+            const areaFaltando = valorFaltando(campoArea);
+            const potenciaFaltando = valorFaltando(campoPotencia);
+            const areaForaDoIntervalo = !areaFaltando && Number(campoArea.value) > 1000;
+            const avisoArea = campoArea.closest(".campo").querySelector(".aviso-tecnico");
+            avisoArea.hidden = !areaForaDoIntervalo;
+            avisoArea.querySelector(".aviso-texto").textContent = areaForaDoIntervalo
+                ? "Área fora do intervalo atendido pelo Quadro 35 (até 1.000 m²). Confira o método de cálculo aplicável."
+                : "";
+            marcarCampo(campoArea, areaFaltando, "Campo obrigatório");
+            marcarCampo(campoPotencia, potenciaFaltando, "Campo obrigatório");
+            requisitos.push({ texto: `Apartamento ${indice + 1} - área útil`, concluido: !areaFaltando });
+            requisitos.push({ texto: `Apartamento ${indice + 1} - potência instalada`, concluido: !potenciaFaltando });
         });
+
+        if (apartamentos.length === 0) {
+            requisitos.push({ texto: "Adicionar pelo menos um apartamento", concluido: false });
+        }
     }
 
     const totalPendencias = renderizarChecklist(requisitos);
 
     botaoEnviar.disabled = totalPendencias > 0;
-    botaoRelatorio.disabled = totalPendencias > 0 || gerandoRelatorio;
+    botaoAdicionar.disabled = usaGruposResidenciais();
+    botaoAdicionarGrupo.disabled = !usaGruposResidenciais();
+    botaoRelatorio.disabled = totalPendencias > 0 || gerandoRelatorio || usaGruposResidenciais();
 
     return totalPendencias === 0;
 }
 
 function montarEdificacao() {
+    if (usaGruposResidenciais()) {
+        const gruposResidenciais = [
+            ...listaGruposResidenciais.querySelectorAll(".grupo-residencial")
+        ].map((grupo, indice) => {
+            const [areaMinimaM2, areaMaximaM2] = grupo
+                .querySelector(".faixa-area-residencial").value.split("|").map(Number);
+            const faixa = grupo.querySelector(".faixa-area-residencial");
+            return {
+                identificacao: `Grupo ${indice + 1}`,
+                tipologia: faixa.selectedOptions[0].dataset.rotulo,
+                areaMinimaM2,
+                areaMaximaM2,
+                quantidade: Number(grupo.querySelector(".quantidade-residencial").value)
+            };
+        });
+        return { gruposResidenciais };
+    }
+
     const apartamentos = [
         ...listaApartamentos.querySelectorAll(".apartamento")
     ].map(apartamento => ({
@@ -392,6 +529,17 @@ function formatarNumero(valor) {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
     });
+}
+
+function formatarFator(valor) {
+    return Number(valor).toLocaleString("pt-BR", {
+        minimumFractionDigits: 4,
+        maximumFractionDigits: 4
+    });
+}
+
+function formatarArea(valor) {
+    return Number(valor).toLocaleString("pt-BR", { maximumFractionDigits: 2 });
 }
 
 function adicionarTexto(tag, classe, texto, pai) {
@@ -561,7 +709,58 @@ function criarItemMemoria(criterio) {
     return item;
 }
 
-function exibirResultado(dados) {
+function exibirResultadoResidencial(cartao, dados, gruposResidenciais) {
+    const residencial = dados.detalhamento?.residencial;
+    if (!residencial) return;
+
+    const secao = document.createElement("section");
+    secao.className = "memoria-residencial";
+    adicionarTexto("h3", "", "Memória de cálculo — Área residencial", secao);
+
+    const etapaNormativa = dados.detalhamento.memoriaCalculo?.find(etapa => etapa.norma);
+    if (etapaNormativa) {
+        adicionarTexto("p", "memoria-residencial-fonte",
+            `Base normativa: ${etapaNormativa.norma} Rev. ${etapaNormativa.revisao}`, secao);
+    }
+
+    const valores = document.createElement("dl");
+    valores.className = "memoria-residencial-valores";
+    const linhas = [
+        ["Demanda residencial (Dr)", `${formatarNumero(residencial.demandaResidencialBaseDrKva)} kVA`],
+        ["Fator de coincidência (Fc)", formatarFator(residencial.fatorCoincidenciaFc)],
+        ["Demanda após coincidência (Dtr)", `${formatarNumero(residencial.demandaCoincidenteDtrKva)} kVA`],
+        ["Fator de segurança (Fr)", formatarNumero(residencial.fatorSegurancaFr)],
+        ["Demanda residencial final (Drf)", `${formatarNumero(residencial.demandaResidencialFinalDrfKva)} kVA`]
+    ];
+    linhas.forEach(([rotulo, valor]) => {
+        const linha = document.createElement("div");
+        adicionarTexto("dt", "", rotulo, linha);
+        adicionarTexto("dd", "", valor, linha);
+        valores.appendChild(linha);
+    });
+    secao.appendChild(valores);
+
+    if (Array.isArray(gruposResidenciais) && gruposResidenciais.length > 0) {
+        adicionarTexto("h4", "", "Grupos considerados", secao);
+        const lista = document.createElement("ul");
+        const criteriosDi = (dados.memoriaCalculo ?? [])
+            .filter(criterio => criterio.criterio === "QUADRO_35");
+        gruposResidenciais.forEach((grupo, indice) => {
+            const di = criteriosDi[indice]?.valorAplicado;
+            const linha = document.createElement("li");
+            const area = grupo.areaMinimaM2 === grupo.areaMaximaM2
+                ? `${formatarArea(grupo.areaMinimaM2)} m²`
+                : `${formatarArea(grupo.areaMinimaM2)}–${formatarArea(grupo.areaMaximaM2)} m²`;
+            const valorDi = ehNumero(di) ? `Di = ${formatarNumero(di)} kVA` : "Di indisponível";
+            linha.textContent = `${grupo.quantidade} unidades — ${area} — ${valorDi}`;
+            lista.appendChild(linha);
+        });
+        secao.appendChild(lista);
+    }
+    cartao.appendChild(secao);
+}
+
+function exibirResultado(dados, gruposResidenciais = []) {
     let cartao = document.getElementById("resultado-demanda");
 
     if (!cartao) {
@@ -613,6 +812,7 @@ function exibirResultado(dados) {
     );
 
     cartao.appendChild(caixaValor);
+    exibirResultadoResidencial(cartao, dados, gruposResidenciais);
     if (
         Array.isArray(dados.memoriaCalculo) &&
         dados.memoriaCalculo.length > 0
@@ -699,7 +899,7 @@ formulario.addEventListener("submit", async evento => {
                 "O cálculo foi respondido, mas o formato da demanda retornada é inválido."
             );
         }
-        exibirResultado(resultadoCalculo);
+        exibirResultado(resultadoCalculo, edificacao.gruposResidenciais ?? []);
 
         mensagem.textContent =
             "Projeto enviado e cálculo concluído com sucesso.";
@@ -728,6 +928,12 @@ campoTomadas.addEventListener("input", () => {
 botaoRelatorio.addEventListener("click", async () => {
     mensagem.className = "mensagem";
     mensagem.textContent = "";
+
+    if (usaGruposResidenciais()) {
+        mensagem.classList.add("mensagem-erro");
+        mensagem.textContent = "A geração de PDF para grupos residenciais ainda não está disponível.";
+        return;
+    }
 
     if (!validar()) {
         mensagem.classList.add("mensagem-erro");
@@ -781,4 +987,6 @@ botaoRelatorio.addEventListener("click", async () => {
     }
 });
 botaoAdicionar.addEventListener("click", adicionarApartamento);
-adicionarApartamento();
+botaoAdicionarGrupo.addEventListener("click", adicionarGrupoResidencial);
+modoResidencial.addEventListener("change", atualizarModoResidencial);
+adicionarGrupoResidencial();
