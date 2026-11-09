@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>DemandWise — Novo projeto</title>
-    <link rel="stylesheet" th:href="@{/css/envio.css(v='20261023-2')}">
+    <link rel="stylesheet" th:href="@{/css/envio.css(v='20261106-1')}">
 </head>
 <body>
 <div class="app">
@@ -98,11 +98,47 @@
                 <div class="layout-formulario">
                     <div class="coluna-formulario">
                         <section class="bloco">
+                            <div class="bloco-cabecalho bloco-cabecalho-apartamentos">
+                                <span class="bloco-icone">01</span>
+                                <div>
+                                    <h2>Unidades residenciais</h2>
+                                    <p>Informe as unidades por faixa de área ou individualmente.</p>
+                                </div>
+                            </div>
+
+                            <div class="campo modo-residencial-campo">
+                                <label for="modo-residencial">Forma de informar unidades</label>
+                                <select id="modo-residencial">
+                                    <option value="grupos" selected>Grupos por faixa de área</option>
+                                    <option value="individuais">Apartamentos individuais</option>
+                                </select>
+                            </div>
+
+                            <div id="entrada-grupos-residenciais">
+                                <div id="lista-grupos-residenciais"></div>
+                                <p class="erro erro-lista" id="erro-grupos-residenciais"></p>
+                                <button type="button" id="btn-adicionar-grupo" class="btn-secundario">
+                                    <span class="mais">+</span>
+                                    Adicionar grupo
+                                </button>
+                            </div>
+
+                            <div id="entrada-apartamentos-individuais" hidden>
+                                <div id="lista-apartamentos"></div>
+                                <p class="erro erro-lista" id="erro-apartamentos"></p>
+                                <button type="button" id="btn-adicionar" class="btn-secundario">
+                                    <span class="mais">+</span>
+                                    Adicionar apartamento
+                                </button>
+                            </div>
+                        </section>
+
+                        <section class="bloco" id="campos-servico-legado" hidden>
                             <div class="bloco-cabecalho">
                                 <span class="bloco-icone">01</span>
                                 <div>
                                     <h2>Dados gerais da edificação</h2>
-                                    <p>Informe as potências previstas para as áreas comuns.</p>
+                                    <p>Campos do fluxo legado para iluminação e tomadas das áreas comuns.</p>
                                 </div>
                             </div>
 
@@ -143,26 +179,8 @@
                             </p>
                         </section>
 
-                        <section class="bloco">
-                            <div class="bloco-cabecalho bloco-cabecalho-apartamentos">
-                                <span class="bloco-icone">02</span>
-                                <div>
-                                    <h2>Unidades consumidoras</h2>
-                                    <p>Adicione os apartamentos que fazem parte da edificação.</p>
-                                </div>
-                            </div>
-
-                            <div id="lista-apartamentos"></div>
-                            <p class="erro erro-lista" id="erro-apartamentos"></p>
-
-                            <button type="button" id="btn-adicionar" class="btn-secundario">
-                                <span class="mais">+</span>
-                                Adicionar apartamento
-                            </button>
-                        </section>
-
                         <div class="rodape-formulario">
-                            <span><span class="asterisco">*</span> Preencha todos os campos obrigatórios.</span>
+                            <span id="nota-campos-formulario"><span class="asterisco">*</span> Preencha os campos obrigatórios.</span>
                             <div class="acoes-formulario">
                                 <button type="submit" id="btn-enviar" class="btn-principal" disabled>
                                     Enviar projeto
@@ -174,6 +192,9 @@
                                 </button>
                             </div>
                         </div>
+                        <p id="aviso-pdf-grupos" class="ajuda-campo aviso-pdf-grupos" hidden>
+                            O PDF atual ainda não apresenta grupos residenciais; use o resultado na tela.
+                        </p>
                         <p id="mensagem" class="mensagem" role="status"></p>
                     </div>
 
@@ -222,6 +243,6 @@
     </main>
 </div>
 
-<script th:src="@{/js/envio.js}"></script>
+<script th:src="@{/js/envio.js(v='20261106-1')}"></script>
 </body>
 </html>
