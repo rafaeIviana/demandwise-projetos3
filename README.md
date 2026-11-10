@@ -33,13 +33,13 @@ A partir desse entendimento, será desenvolvido um protótipo que permita realiz
 
 As tecnologias utilizadas no projeto serão definidas e atualizadas conforme o desenvolvimento do protótipo.
 
-| Tecnologia | Utilização                                  |
-| ---------- | ------------------------------------------- |
+| Tecnologia | Utilização |
+| ---------- | ---------- |
 | Java | Linguagem principal utilizada no desenvolvimento do backend e das regras de negócio |
-| SpringBoot  | Framework utilizado para desenvolver o backend e disponibilizar a API da aplicação |
-| Maven  | Gerenciamento de dependências e construção do projeto Java |
+| SpringBoot | Framework utilizado para desenvolver o backend e disponibilizar a API da aplicação |
+| Maven | Gerenciamento de dependências e construção do projeto Java |
 | Thymeleaf | Construção da interface web integrada ao SpringBoot |
-| PostgreSQL  | Banco de dados utilizado para armazenamento das informações | 
+| PostgreSQL | Banco de dados utilizado para armazenamento das informações |
 | Git/GitHub | Controle de versão e organização do projeto |
 
 ---
@@ -66,9 +66,8 @@ Nesta entrega foi realizada a análise inicial do material disponibilizado pela 
   - US-11 — Seleção de tipo de instalação aplicando regras automaticamente
   - US-12 — Segurança e conformidade de dados
 - **Documentação das histórias:** [Acessar PDF](readme_img/demandwise-backlog.pdf)
-* **Protótipo do Figma:** [Acessar protótipo](https://sway-ashen-54282395.figma.site)
+- **Protótipo do Figma:** [Acessar protótipo](https://sway-ashen-54282395.figma.site)
 - **Vídeo de apresentação do protótipo:** [Assistir no YouTube](https://youtu.be/8bLrNAD9KFs)
-
 
 ---
 
@@ -90,6 +89,7 @@ Implementação da funcionalidade de identificação e explicação de valores q
 
 * **Screencast — Explicação do código e das histórias implementadas:** [Assistir no YouTube](https://youtu.be/o75v9s-ksvc)
 
+---
 
 ## Entrega 03 — Evolução do protótipo
 
@@ -98,34 +98,62 @@ Nesta entrega, o protótipo do DemandWise foi ampliado com novas funcionalidades
 ### Histórias de usuário contempladas
 
 - **US-03 — Checklist automático das Pendências MUC:** implementação da funcionalidade de checklist para auxiliar na identificação de pendências.
+
 - **US-04 — Padronização entre analistas:** desenvolvimento de regras e validações para contribuir com a padronização do processo de análise.
+
 - **US-06 — Validação impede envio com dado obrigatório faltante:** implementação de validações para impedir o envio quando houver informações obrigatórias ausentes.
+
 - **US-07 — Geração automática do relatório final de cálculo:** implementação da geração de relatório em PDF com os resultados do cálculo.
+
 - **US-11 — Seleção de tipo de instalação aplicando regras automaticamente:** implementação da seleção do tipo de instalação para orientar a aplicação das regras correspondentes.
 
 ### Screencasts
 
 - **Screencast — Demonstração de uso do sistema:** [Assistir no YouTube](https://youtu.be/SKhwtX0g32c)
+
 - **Screencast — Explicação do código e das histórias implementadas:** [Assistir no YouTube](https://youtu.be/FAqI80lYYjY)
+
 ---
 
-**Status da entrega:** funcionalidades em desenvolvimento e validação contínua.
+## Entrega 04 — Evolução do protótipo e novas funcionalidades
+
+Nesta entrega, o protótipo do DemandWise foi ampliado com novas funcionalidades relacionadas ao cálculo de demanda, reutilização de informações de edificações, pré-validação de projetos e segurança e conformidade dos dados.
+
+Também foram realizados ajustes na integração entre o cálculo, as validações e a visualização dos projetos no painel do analista, além da criação e ampliação de testes para verificar o comportamento das funcionalidades implementadas.
+
+### Histórias de usuário contempladas
+
+- **US-05 — Templates reaproveitáveis de prédio-tipo:** implementação da estrutura para reutilização de modelos de edificações, permitindo organizar e reaproveitar informações de projetos com características semelhantes.
+
+- **US-08 — Projeto chega pré-validado para o analista:** implementação do fluxo de pré-validação do projeto antes da análise, realizando verificações e o cálculo da demanda antes que o projeto seja encaminhado ao analista. Também foram realizados ajustes na visualização dos projetos residenciais agrupados no painel do analista.
+
+- **US-10 — Dashboard de métricas de redução de reprovação:** evolução das funcionalidades relacionadas ao cálculo estruturado da demanda e à organização dos resultados obtidos a partir das regras da DIS-NOR-053.
+
+- **US-12 — Segurança e conformidade de dados:** implementação de validações e mecanismos de controle relacionados à segurança e à conformidade dos dados utilizados pelo sistema.
+
+### Screencasts
+
+- **Screencast — Demonstração de uso do sistema:** [Assistir no YouTube](https://youtu.be/3h46SziuQUU)
+
+- **Screencast — Explicação do código e das histórias implementadas:** [Assistir no YouTube](https://youtu.be/-ryIHQQSH0I)
+
+**Status da entrega:** funcionalidades implementadas e em processo de validação contínua.
 
 ---
 
 # Membros da equipe
 
-| Nome                 | E-mail institucional                            | Cargo             |
+| Nome | E-mail institucional | Cargo |
 | -------------------- | ----------------------------------------------- | ----------------- |
 | Arthur Guimarães | [avsg@cesar.school](mailto:avsg@cesar.school) | Organizer |
 | Breno Gabriel | [bgas@cesar.school](mailto:bgas@cesar.school) | Product Owner |
 | Christopher Mark | [cmjm@cesar.school](mailto:cmjm@cesar.school) | Organizer |
 | Gilberto Dias | [gdsn@cesar.school](mailto:gdsn@cesar.school) | Developer |
-| Heitor Antonio  | [haotd@cesar.school](mailto:haotd@cesar.school) | Developer | 
+| Heitor Antonio | [haotd@cesar.school](mailto:haotd@cesar.school) | Developer |
 | João Vitor Lopes | [jvla@cesar.school](mailto:jvla@cesar.school) | Developer |
 | Luiz Guilherme Silvestre | [lgsgs@cesar.school](mailto:lgsgs@cesar.school) | Developer |
 | Pedro Lima | [phpl@cesar.school](mailto:phpl@cesar.school) | Developer |
-| Rafael Viana | [rlvs@cesar.school](mailto:rlvs@cesar.school) | Tech Lead | 
+| Rafael Viana | [rlvs@cesar.school](mailto:rlvs@cesar.school) | Tech Lead |
 
 ---
 
@@ -133,7 +161,9 @@ Nesta entrega, o protótipo do DemandWise foi ampliado com novas funcionalidades
 
 ### Neoenergia
 
-* **DIS-NOR-053 — Norma utilizada como base para o projeto:** [Link]
+* **DIS-NOR-053 — Norma utilizada como base para o projeto:** [Link](https://www.neoenergia.com/documents/d/rn/dis-nor-053-rev06)
+
+A norma utilizada como referência para o cálculo é a **DIS-NOR-053 — Fornecimento de Energia Elétrica à Edificações com Múltiplas Unidades Consumidoras até 34,5 kV, Rev. 06**, aprovada em 09/09/2025. A página de normas técnicas da Neoenergia Pernambuco também lista a DIS-NOR-053 como Rev. 06.
 
 ### Materiais produzidos pela equipe
 
@@ -149,4 +179,6 @@ Nesta entrega, o protótipo do DemandWise foi ampliado com novas funcionalidades
 
 **Em desenvolvimento.**
 
-O projeto encontra-se atualmente na etapa de análise e organização das regras de cálculo apresentadas na norma DIS-NOR-053. As próximas etapas serão voltadas para o desenvolvimento, testes e validação do protótipo.
+O projeto encontra-se em evolução contínua, com funcionalidades de cálculo, validação, pré-validação e apresentação dos resultados sendo desenvolvidas e testadas.
+
+As próximas etapas serão voltadas para a continuidade da implementação das histórias de usuário, aprimoramento das funcionalidades existentes e validação do protótipo.
