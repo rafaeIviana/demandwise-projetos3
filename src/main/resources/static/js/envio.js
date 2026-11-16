@@ -786,6 +786,7 @@ adicionarApartamento();
 // ===== US-05: templates de prédio-tipo =====
 const seletorTemplate = document.getElementById("seletor-template");
 const botaoSalvarTemplate = document.getElementById("btn-salvar-template");
+let carregamentoTemplate = 0;
 
 function mostrarMensagem(texto, tipo) {
     mensagem.textContent = texto;
@@ -845,14 +846,21 @@ function preencherFormulario(edificacao) {
 }
 
 seletorTemplate.addEventListener("change", async () => {
+    const carregamentoAtual = ++carregamentoTemplate;
     const id = seletorTemplate.value;
     if (id === "") {
+        preencherFormulario({});
+        mostrarMensagem("");
         return;
     }
 
     try {
         const resposta = await fetch(`/api/templates/${id}`);
         const resultado = await lerResposta(resposta);
+
+        if (carregamentoAtual !== carregamentoTemplate || seletorTemplate.value !== id) {
+            return;
+        }
 
         if (!resposta.ok) {
             throw new Error(
@@ -866,6 +874,9 @@ seletorTemplate.addEventListener("change", async () => {
             "ok"
         );
     } catch (erro) {
+        if (carregamentoAtual !== carregamentoTemplate || seletorTemplate.value !== id) {
+            return;
+        }
         mostrarMensagem(erro.message || "Erro ao carregar o template.", "erro");
     }
 });
