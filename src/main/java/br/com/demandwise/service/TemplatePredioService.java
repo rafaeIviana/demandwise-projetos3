@@ -63,6 +63,10 @@ public class TemplatePredioService {
             copia.setPotenciasMotores(new ArrayList<>(origem.getPotenciasMotores()));
         }
         copia.setTipoInstalacao(origem.getTipoInstalacao());
+        copia.setGruposResidenciais(origem.getGruposResidenciais());
+        // Os novos componentes são records imutáveis, inclusive suas listas.
+        copia.setCargasCondominio(origem.getCargasCondominio());
+        copia.setMotobombaIncendio(origem.getMotobombaIncendio());
         return copia;
     }
 }

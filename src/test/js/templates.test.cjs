@@ -14,6 +14,8 @@ function setup() {
     const lighting = { value: '' };
     const outlets = { value: '' };
     const apartments = [];
+    const groups = [];
+    const mode = { value: 'grupos' };
     const pending = [];
     let resultVisible = true;
     const list = {
@@ -25,6 +27,17 @@ function setup() {
             ? selector : { addEventListener() {} } },
         mensagem: message, campoIluminacao: lighting, campoTomadas: outlets,
         listaApartamentos: list, validacoesNormativas: new WeakMap(),
+        modoResidencial: mode,
+        listaGruposResidenciais: {
+            replaceChildren: () => groups.splice(0),
+            get lastElementChild() { return groups.at(-1); }
+        },
+        atualizarModoResidencial() {},
+        adicionarGrupoResidencial() {
+            const fields = { '.faixa-area-residencial': { value: '' },
+                '.quantidade-residencial': { value: '' } };
+            groups.push({ querySelector: name => fields[name] });
+        },
         limparResultado: () => resultVisible = false,
         validar() {}, atualizarAlertaNormativo() {},
         adicionarApartamento() {
@@ -42,7 +55,7 @@ function setup() {
     };
     runInNewContext(source.slice(source.indexOf('// ===== US-05:')), context);
     return {
-        lighting, outlets, apartments, message, pending,
+        lighting, outlets, apartments, groups, mode, message, pending,
         resultVisible: () => resultVisible,
         select(id) { selector.value = id; return listeners.change(); },
         respond(index, value) {
@@ -76,6 +89,10 @@ test('começar do zero limpa campos, apartamentos e resultado e descarta respost
     assert.equal(ui.apartments[0].querySelector('.potencia-instalada').value, '');
     assert.equal(ui.resultVisible(), false);
     assert.equal(ui.message.textContent, '');
+    assert.equal(ui.mode.value, 'grupos');
+    assert.equal(ui.groups.length, 1);
+    assert.equal(ui.groups[0].querySelector('.faixa-area-residencial').value, '');
+    assert.equal(ui.groups[0].querySelector('.quantidade-residencial').value, '');
     ui.respond(1, 'B'); await pending;
     assert.equal(ui.lighting.value, '');
     assert.equal(ui.message.textContent, '');
@@ -87,4 +104,22 @@ test('erro de uma seleção antiga não sobrescreve a mensagem atual', async () 
     const b = ui.select('B'); ui.respond(1, 'B'); await b;
     ui.pending[0].reject(new Error('Falha de A')); await a;
     assert.match(ui.message.textContent, /Template "B"/);
+});
+
+test('carrega template agrupado e troca para apartamentos individuais sem manter grupos antigos', async () => {
+    const ui = setup();
+    const grouped = ui.select('grupo');
+    ui.pending[0].resolve({ ok: true, body: { nome: 'Grupo', edificacao: {
+        gruposResidenciais: [{ areaMinimaM2: 76, areaMaximaM2: 80, quantidade: 12 }]
+    } } });
+    await grouped;
+    assert.equal(ui.mode.value, 'grupos');
+    assert.equal(ui.groups.length, 1);
+    assert.equal(ui.groups[0].querySelector('.faixa-area-residencial').value, '76|80');
+    assert.equal(ui.groups[0].querySelector('.quantidade-residencial').value, 12);
+    const individual = ui.select('apto'); ui.respond(1, 'A'); await individual;
+    assert.equal(ui.mode.value, 'individuais');
+    assert.equal(ui.apartments[0].querySelector('.area-util').value, 50);
+    assert.equal(ui.groups.length, 1);
+    assert.equal(ui.groups[0].querySelector('.quantidade-residencial').value, '');
 });

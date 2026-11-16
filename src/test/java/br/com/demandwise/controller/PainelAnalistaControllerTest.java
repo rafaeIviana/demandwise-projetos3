@@ -2,6 +2,7 @@ package br.com.demandwise.controller;
 
 import br.com.demandwise.model.Apartamento;
 import br.com.demandwise.model.Edificacao;
+import br.com.demandwise.model.GrupoResidencial;
 import br.com.demandwise.projeto.ProjetoPreValidado;
 import br.com.demandwise.service.CriterioAplicado;
 import br.com.demandwise.service.ProjetoPreValidadoService;
@@ -17,6 +18,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
+import java.math.BigDecimal;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -77,6 +79,8 @@ class PainelAnalistaControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("analista/projeto-detalhes"))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("42,13")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Quantidade de apartamentos")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("<dd>1</dd>")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Parâmetro")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("areaUtil=40.0")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Potência de recarga veicular")))
@@ -90,5 +94,56 @@ class PainelAnalistaControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(view().name("analista/projeto-nao-encontrado"))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Voltar à listagem")));
+    }
+
+    @Test
+    void listagemAgrupadaMostraQuantidadeDeUnidades() throws Exception {
+        Edificacao edificacao = new Edificacao();
+        edificacao.setGruposResidenciais(List.of(
+                new GrupoResidencial("Faixa 41–45 m²", "41–45 m²", BigDecimal.valueOf(41), BigDecimal.valueOf(45), 12)
+        ));
+        ProjetoPreValidado projeto = service.salvar(new ProjetoPreValidado(null, "Pré-validado", edificacao,
+                new ResultadoDemanda(17.64, List.of())));
+
+        mockMvc.perform(get("/analista/projetos"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("12 unidades residenciais")));
+    }
+
+    @Test
+    void detalhesAgrupadosMostramUmGrupoESuasUnidadesSemApartamentos() throws Exception {
+        Edificacao edificacao = new Edificacao();
+        edificacao.setGruposResidenciais(List.of(
+                new GrupoResidencial("Faixa 41–45 m²", "41–45 m²", BigDecimal.valueOf(41), BigDecimal.valueOf(45), 12)
+        ));
+        ProjetoPreValidado projeto = service.salvar(new ProjetoPreValidado(null, "Pré-validado", edificacao,
+                new ResultadoDemanda(17.64, List.of())));
+
+        mockMvc.perform(get("/analista/projetos/" + projeto.id()))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Quantidade de unidades residenciais")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Faixa 41–45 m²")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("41–45 m²")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("12</dd>")));
+    }
+
+    @Test
+    void detalhesAgrupadosSomamMultiplosGrupos() throws Exception {
+        Edificacao edificacao = new Edificacao();
+        edificacao.setGruposResidenciais(List.of(
+                new GrupoResidencial("Faixa 41–45 m²", "41–45 m²", BigDecimal.valueOf(41), BigDecimal.valueOf(45), 12),
+                new GrupoResidencial("Faixa 46–50 m²", "46–50 m²", BigDecimal.valueOf(46), BigDecimal.valueOf(50), 20)
+        ));
+        ProjetoPreValidado projeto = service.salvar(new ProjetoPreValidado(null, "Pré-validado", edificacao,
+                new ResultadoDemanda(40, List.of())));
+
+        mockMvc.perform(get("/analista/projetos/" + projeto.id()))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Quantidade de unidades residenciais")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("32</dd>")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Faixa 41–45 m²")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Faixa 46–50 m²")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("12</dd>")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("20</dd>")));
     }
 }

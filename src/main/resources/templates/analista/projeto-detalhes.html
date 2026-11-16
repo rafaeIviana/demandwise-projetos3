@@ -66,19 +66,19 @@
                     <dl class="dados-grade">
                         <div><dt>Status</dt><dd><span class="status-pre-validado"><span aria-hidden="true">✓</span><span th:text="${projeto.status}">Pré-validado</span></span></dd></div>
                         <div><dt>Tipo de instalação</dt><dd th:text="${projeto.edificacao.tipoInstalacao.descricao}">Residencial</dd></div>
-                        <div><dt>Quantidade de apartamentos</dt><dd th:text="${#lists.size(projeto.edificacao.apartamentos)}">1</dd></div>
+                        <div><dt th:text="${projeto.edificacao.representacaoResidencialAgrupada ? 'Quantidade de unidades residenciais' : 'Quantidade de apartamentos'}">Quantidade de apartamentos</dt><dd th:text="${projeto.edificacao.quantidadeUnidadesResidenciais}">1</dd></div>
                         <div><dt>Potência de iluminação</dt><dd th:text="|${projeto.edificacao.potenciaIluminacao} kW|">0 kW</dd></div>
                         <div><dt>Potência de tomadas</dt><dd th:text="|${projeto.edificacao.potenciaTomadas} kW|">0 kW</dd></div>
-                        <div><dt>Potências de motores</dt><dd th:if="${#lists.isEmpty(projeto.edificacao.potenciasMotores)}">Nenhuma informada</dd><dd th:unless="${#lists.isEmpty(projeto.edificacao.potenciasMotores)}" th:text="${projeto.edificacao.potenciasMotores}">[]</dd></div>
+                        <div><dt>Potências de motores</dt><dd th:if="${projeto.edificacao.potenciasMotores == null || #lists.isEmpty(projeto.edificacao.potenciasMotores)}">Nenhuma informada</dd><dd th:unless="${projeto.edificacao.potenciasMotores == null || #lists.isEmpty(projeto.edificacao.potenciasMotores)}" th:text="${projeto.edificacao.potenciasMotores}">[]</dd></div>
                     </dl>
                 </section>
 
                 <section class="bloco secao-detalhes">
                     <div class="bloco-cabecalho">
                         <span class="bloco-icone">02</span>
-                        <div><h2>Apartamentos</h2><p>Dados das unidades consumidoras incluídas.</p></div>
+                        <div><h2 th:text="${projeto.edificacao.representacaoResidencialAgrupada ? 'Grupos residenciais' : 'Apartamentos'}">Apartamentos</h2><p th:text="${projeto.edificacao.representacaoResidencialAgrupada ? 'Faixas de área e quantidades incluídas.' : 'Dados das unidades consumidoras incluídas.'}">Dados das unidades consumidoras incluídas.</p></div>
                     </div>
-                    <div class="lista-apartamentos-analista">
+                    <div class="lista-apartamentos-analista" th:unless="${projeto.edificacao.representacaoResidencialAgrupada}">
                         <article class="apartamento-analista" th:each="apartamento, iteracao : ${projeto.edificacao.apartamentos}">
                             <h3 th:text="|Apartamento ${iteracao.count}|">Apartamento 1</h3>
                             <dl class="dados-grade">
@@ -86,6 +86,16 @@
                                 <div><dt>Potência instalada</dt><dd th:text="|${apartamento.potenciaInstalada} kW|">0 kW</dd></div>
                                 <div><dt>Potência de recarga veicular</dt><dd th:text="|${apartamento.potenciaRecargaVe} kW|">0 kW</dd></div>
                                 <div><dt>Estudo de rede informado</dt><dd th:text="${apartamento.possuiEstudoDeRede ? 'Sim' : 'Não'}">Não</dd></div>
+                            </dl>
+                        </article>
+                    </div>
+                    <div class="lista-apartamentos-analista" th:if="${projeto.edificacao.representacaoResidencialAgrupada}">
+                        <article class="apartamento-analista" th:each="grupo, iteracao : ${projeto.edificacao.gruposResidenciais}">
+                            <h3 th:text="${grupo.identificacao == null || #strings.isEmpty(grupo.identificacao) ? 'Grupo residencial ' + iteracao.count : grupo.identificacao}">Grupo residencial 1</h3>
+                            <dl class="dados-grade">
+                                <div><dt>Tipologia/faixa</dt><dd th:text="${grupo.tipologia}">41–45 m²</dd></div>
+                                <div><dt>Área útil</dt><dd th:text="|${grupo.areaMinimaM2}–${grupo.areaMaximaM2} m²|">41–45 m²</dd></div>
+                                <div><dt>Quantidade de unidades</dt><dd th:text="${grupo.quantidade}">12</dd></div>
                             </dl>
                         </article>
                     </div>

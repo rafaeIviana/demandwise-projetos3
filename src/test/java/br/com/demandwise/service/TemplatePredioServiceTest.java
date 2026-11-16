@@ -2,15 +2,55 @@ package br.com.demandwise.service;
 
 import br.com.demandwise.model.Apartamento;
 import br.com.demandwise.model.Edificacao;
+import br.com.demandwise.model.GrupoResidencial;
+import br.com.demandwise.model.CargasCondominio;
+import br.com.demandwise.model.CargaInstalada;
+import br.com.demandwise.model.MotobombaIncendio;
+import br.com.demandwise.model.Potencia;
+import br.com.demandwise.model.UnidadePotencia;
 import br.com.demandwise.projeto.TemplatePredio;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class TemplatePredioServiceTest {
+
+    @Test
+    void preservaNovoModeloSemCompartilharAlteracoesDaEdificacao() {
+        TemplatePredioService service = new TemplatePredioService();
+        Edificacao origem = new Edificacao();
+        var grupo = new GrupoResidencial("G1", "76–80 m²",
+                BigDecimal.valueOf(76), BigDecimal.valueOf(80), 12);
+        var potencia = new Potencia(BigDecimal.TEN, UnidadePotencia.KW);
+        var cargas = new CargasCondominio(
+                List.of(new CargaInstalada("Iluminação", potencia, 2)),
+                List.of(), List.of(), List.of(), List.of(), List.of());
+        var bomba = new MotobombaIncendio(true, "Bomba", potencia);
+        origem.setGruposResidenciais(List.of(grupo));
+        origem.setCargasCondominio(cargas);
+        origem.setMotobombaIncendio(bomba);
+        long id = service.salvar("Agrupado", origem).id();
+        origem.setGruposResidenciais(List.of());
+        origem.setCargasCondominio(null);
+        origem.setMotobombaIncendio(null);
+
+        Edificacao carregada = service.buscarPorId(id).orElseThrow().edificacao();
+        assertEquals(List.of(grupo), carregada.getGruposResidenciais());
+        assertEquals(cargas, carregada.getCargasCondominio());
+        assertEquals(bomba, carregada.getMotobombaIncendio());
+        carregada.setGruposResidenciais(List.of());
+        carregada.setCargasCondominio(null);
+        carregada.setMotobombaIncendio(null);
+
+        Edificacao salva = service.buscarPorId(id).orElseThrow().edificacao();
+        assertEquals(List.of(grupo), salva.getGruposResidenciais());
+        assertEquals(cargas, salva.getCargasCondominio());
+        assertEquals(bomba, salva.getMotobombaIncendio());
+    }
 
     private Edificacao edificacaoExemplo() {
         Edificacao e = new Edificacao(new ArrayList<>(List.of(

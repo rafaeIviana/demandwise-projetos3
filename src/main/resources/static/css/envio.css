@@ -1459,3 +1459,106 @@ a {
     #resultado-demanda .memoria-parametro dd { text-align: left; }
     #resultado-demanda .memoria-aplicado { align-items: flex-start; flex-direction: column; gap: 4px; }
 }
+
+.campo > select,
+.campo label > select {
+    width: 100%;
+    min-width: 0;
+    padding: 11px 12px;
+    border: 1px solid #dfe4ed;
+    border-radius: 8px;
+    outline: 0;
+    background: #fff;
+    color: var(--texto);
+    font-size: 12px;
+}
+
+.modo-residencial-campo {
+    max-width: 360px;
+}
+
+.grupo-residencial {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 18px;
+}
+
+.grupo-residencial .apartamento-cabecalho {
+    grid-column: 1 / -1;
+}
+
+.grupo-residencial .campo:last-child {
+    margin-bottom: 0;
+}
+
+.aviso-pdf-grupos {
+    color: #7b8798;
+}
+
+#resultado-demanda .memoria-residencial {
+    margin-top: 17px;
+    padding: 18px;
+    border: 1px solid #dce6ff;
+    border-radius: 10px;
+    background: #f7f9ff;
+}
+
+#resultado-demanda .memoria-residencial h3 {
+    margin: 0;
+    color: #263756;
+    font-size: 14px;
+}
+
+#resultado-demanda .memoria-residencial-fonte {
+    margin: 6px 0 14px;
+    color: #738099;
+    font-size: 10px;
+}
+
+#resultado-demanda .memoria-residencial-valores {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 16px;
+    margin: 0;
+}
+
+#resultado-demanda .memoria-residencial-valores > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid #e5eaf6;
+    font-size: 11px;
+}
+
+#resultado-demanda .memoria-residencial-valores dt {
+    color: #58657c;
+}
+
+#resultado-demanda .memoria-residencial-valores dd {
+    margin: 0;
+    color: #243b68;
+    font-weight: 700;
+    text-align: right;
+}
+
+#resultado-demanda .memoria-residencial h4 {
+    margin: 16px 0 8px;
+    color: #344057;
+    font-size: 11px;
+}
+
+#resultado-demanda .memoria-residencial ul {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+    padding-left: 18px;
+    color: #58657c;
+    font-size: 11px;
+}
+
+@media (max-width: 560px) {
+    .grupo-residencial { grid-template-columns: minmax(0, 1fr); }
+    .grupo-residencial .apartamento-cabecalho { grid-column: auto; }
+    #resultado-demanda .memoria-residencial-valores { grid-template-columns: minmax(0, 1fr); }
+}

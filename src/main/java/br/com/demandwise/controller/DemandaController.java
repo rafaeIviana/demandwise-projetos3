@@ -43,7 +43,8 @@ public class DemandaController {
             return ResponseEntity.ok(
                     new ResultadoDemanda(
                             resultado.demandaTotalArredondada(),
-                            resultado.memoriaCalculo()
+                            resultado.memoriaCalculo(),
+                            resultado.detalhamento()
                     )
             );
 

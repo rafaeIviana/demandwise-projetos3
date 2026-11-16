@@ -70,7 +70,8 @@
                             </div>
                             <h3 th:text="${projeto.edificacao.tipoInstalacao.descricao}">Edificação residencial</h3>
                             <p class="projeto-resumo">
-                                <span th:text="${#lists.size(projeto.edificacao.apartamentos) == 1 ? '1 apartamento' : #lists.size(projeto.edificacao.apartamentos) + ' apartamentos'}">1 apartamento</span>
+                                <span th:if="${!projeto.edificacao.representacaoResidencialAgrupada}" th:text="${projeto.edificacao.quantidadeUnidadesResidenciais == 1 ? '1 apartamento' : projeto.edificacao.quantidadeUnidadesResidenciais + ' apartamentos'}">1 apartamento</span>
+                                <span th:if="${projeto.edificacao.representacaoResidencialAgrupada}" th:text="${projeto.edificacao.quantidadeUnidadesResidenciais == 1 ? '1 unidade residencial' : projeto.edificacao.quantidadeUnidadesResidenciais + ' unidades residenciais'}">12 unidades residenciais</span>
                                 <span class="separador-resumo">·</span>
                                 <span th:text="|Iluminação ${projeto.edificacao.potenciaIluminacao} kW|">Iluminação 0 kW</span>
                                 <span class="separador-resumo">·</span>
