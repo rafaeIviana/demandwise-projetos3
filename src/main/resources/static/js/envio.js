@@ -990,3 +990,161 @@ botaoAdicionar.addEventListener("click", adicionarApartamento);
 botaoAdicionarGrupo.addEventListener("click", adicionarGrupoResidencial);
 modoResidencial.addEventListener("change", atualizarModoResidencial);
 adicionarGrupoResidencial();
+adicionarApartamento();
+
+// ===== US-05: templates de prédio-tipo =====
+const seletorTemplate = document.getElementById("seletor-template");
+const botaoSalvarTemplate = document.getElementById("btn-salvar-template");
+let carregamentoTemplate = 0;
+
+function mostrarMensagem(texto, tipo) {
+    mensagem.textContent = texto;
+    mensagem.className = tipo ? `mensagem mensagem-${tipo}` : "mensagem";
+}
+
+async function carregarListaTemplates(selecionarId) {
+    try {
+        const resposta = await fetch("/api/templates");
+        if (!resposta.ok) {
+            throw new Error("Falha ao listar templates.");
+        }
+        const lista = await resposta.json();
+
+        seletorTemplate.replaceChildren(new Option("Começar do zero", ""));
+        lista.forEach(t => {
+            seletorTemplate.appendChild(new Option(t.nome, String(t.id)));
+        });
+
+        if (selecionarId != null) {
+            seletorTemplate.value = String(selecionarId);
+        }
+    } catch {
+        // Sem lista, o formulário continua funcionando normalmente.
+    }
+}
+
+function preencherFormulario(edificacao) {
+    limparResultado();
+
+    listaApartamentos.querySelectorAll(".apartamento").forEach(apto => {
+        validacoesNormativas.get(apto)?.abort();
+        validacoesNormativas.delete(apto);
+        apto.remove();
+    });
+    listaGruposResidenciais.replaceChildren();
+
+    // Só preenche os campos; eles continuam editáveis.
+    campoIluminacao.value = edificacao.potenciaIluminacao || "";
+    campoTomadas.value = edificacao.potenciaTomadas || "";
+
+    const apartamentos = edificacao.apartamentos || [];
+    const grupos = edificacao.gruposResidenciais || [];
+    modoResidencial.value = apartamentos.length > 0 ? "individuais" : "grupos";
+
+    if (grupos.length === 0) {
+        adicionarGrupoResidencial();
+    } else {
+        grupos.forEach(dados => {
+            adicionarGrupoResidencial();
+            const grupo = listaGruposResidenciais.lastElementChild;
+            grupo.querySelector(".faixa-area-residencial").value =
+                `${dados.areaMinimaM2}|${dados.areaMaximaM2}`;
+            grupo.querySelector(".quantidade-residencial").value = dados.quantidade;
+        });
+    }
+
+    if (apartamentos.length === 0) {
+        adicionarApartamento();
+    } else {
+        apartamentos.forEach(dados => {
+            adicionarApartamento();
+            const apto = listaApartamentos.lastElementChild;
+            apto.querySelector(".area-util").value = dados.areaUtil || "";
+            apto.querySelector(".potencia-instalada").value =
+                dados.potenciaInstalada || "";
+            atualizarAlertaNormativo(apto);
+        });
+    }
+
+    atualizarModoResidencial();
+}
+
+seletorTemplate.addEventListener("change", async () => {
+    const carregamentoAtual = ++carregamentoTemplate;
+    const id = seletorTemplate.value;
+    if (id === "") {
+        preencherFormulario({});
+        mostrarMensagem("");
+        return;
+    }
+
+    try {
+        const resposta = await fetch(`/api/templates/${id}`);
+        const resultado = await lerResposta(resposta);
+
+        if (carregamentoAtual !== carregamentoTemplate || seletorTemplate.value !== id) {
+            return;
+        }
+
+        if (!resposta.ok) {
+            throw new Error(
+                obterMensagemErro(resultado, "Não foi possível carregar o template.")
+            );
+        }
+
+        preencherFormulario(resultado.edificacao);
+        mostrarMensagem(
+            `Template "${resultado.nome}" carregado. Edite os campos se precisar.`,
+            "ok"
+        );
+    } catch (erro) {
+        if (carregamentoAtual !== carregamentoTemplate || seletorTemplate.value !== id) {
+            return;
+        }
+        mostrarMensagem(erro.message || "Erro ao carregar o template.", "erro");
+    }
+});
+
+botaoSalvarTemplate.addEventListener("click", async () => {
+    if (!validar()) {
+        mostrarMensagem(
+            "Preencha todos os campos obrigatórios antes de salvar o template.",
+            "erro"
+        );
+        return;
+    }
+
+    const nome = window.prompt("Nome do template:");
+    if (nome === null || nome.trim() === "") {
+        return;
+    }
+
+    botaoSalvarTemplate.disabled = true;
+
+    try {
+        const resposta = await fetch("/api/templates", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                nome: nome.trim(),
+                edificacao: montarEdificacao()
+            })
+        });
+        const resultado = await lerResposta(resposta);
+
+        if (!resposta.ok) {
+            throw new Error(
+                obterMensagemErro(resultado, "Não foi possível salvar o template.")
+            );
+        }
+
+        await carregarListaTemplates(resultado.id);
+        mostrarMensagem(`Template "${resultado.nome}" salvo.`, "ok");
+    } catch (erro) {
+        mostrarMensagem(erro.message || "Erro ao salvar o template.", "erro");
+    } finally {
+        botaoSalvarTemplate.disabled = false;
+    }
+});
+
+carregarListaTemplates();
